@@ -1,0 +1,120 @@
+name: 🐞 Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug", "triage"]
+type: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug! Please fill out the information below to help us diagnose and fix the issue.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched the existing issues and this is not a duplicate
+          required: true
+        - label: I have read the [README](https://github.com/jacob-hartmann/kinsta-mcp/blob/main/README.md) and [SUPPORT](https://github.com/jacob-hartmann/kinsta-mcp/blob/main/SUPPORT.md) documentation
+          required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug you encountered
+      placeholder: A clear and concise description of what went wrong
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen instead?
+      placeholder: A clear and concise description of what you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide step-by-step instructions to reproduce the issue
+      placeholder: |
+        1. Configure the server with...
+        2. Run command...
+        3. Observe error...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      description: What version of kinsta-mcp are you using?
+      placeholder: "e.g., 0.1.0 (check with: pnpm list kinsta-mcp)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: nodejs-version
+    attributes:
+      label: Node.js version
+      description: What version of Node.js are you running?
+      options:
+        - "22.x (required minimum)"
+        - "23.x or higher"
+        - "Other (please specify in additional context)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mcp-client
+    attributes:
+      label: MCP Client
+      description: Which MCP client are you using?
+      options:
+        - Claude Desktop
+        - Cursor
+        - Claude Code (CLI)
+        - Other (please specify in additional context)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other (please specify in additional context)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: |
+        Please copy and paste relevant log output from **stderr**.
+        Note: stdout is reserved for JSON-RPC protocol messages.
+        This will be automatically formatted as code, so no need for backticks.
+
+        **Important**: Redact any sensitive information (API keys, etc.)
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here (screenshots, configuration snippets, etc.)
+    validations:
+      required: false

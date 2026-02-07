@@ -1,0 +1,9 @@
+# Update this handle/team to match your GitHub account/org.
+/.github/workflows/ @jacob-hartmann
+/.github/dependabot.yml @jacob-hartmann
+
+/package.json @jacob-hartmann
+/pnpm-lock.yaml @jacob-hartmann
+/.npmrc @jacob-hartmann
+/tsconfig.json @jacob-hartmann
+/tsup.config.ts @jacob-hartmann

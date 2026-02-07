@@ -1,0 +1,72 @@
+name: ❓ Question
+description: Ask a question about using kinsta-mcp
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question? Before submitting, please check the following resources:
+        - [README](https://github.com/jacob-hartmann/kinsta-mcp/blob/main/README.md) - Setup, configuration, and features
+        - [SUPPORT](https://github.com/jacob-hartmann/kinsta-mcp/blob/main/SUPPORT.md) - Support policy and self-help resources
+        - [Existing Issues](https://github.com/jacob-hartmann/kinsta-mcp/issues?q=is%3Aissue) - Your question may have been answered
+        - [Kinsta API Docs](https://kinsta.com/docs/kinsta-api/) - For Kinsta-specific questions
+        - [MCP Docs](https://modelcontextprotocol.io/) - For protocol-level questions
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm you've reviewed the available resources
+      options:
+        - label: I have read the README and SUPPORT documentation
+          required: true
+        - label: I have searched existing issues and my question hasn't been answered
+          required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What would you like to know?
+      placeholder: Ask your question clearly and provide context
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mcp-client
+    attributes:
+      label: MCP Client
+      description: Which MCP client are you using?
+      options:
+        - Claude Desktop
+        - Cursor
+        - Claude Code (CLI)
+        - Other (please specify below)
+        - Not applicable
+    validations:
+      required: false
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Relevant configuration
+      description: |
+        Share relevant configuration or environment details (if applicable).
+        **Important**: Redact sensitive information (API keys, etc.)
+      placeholder: |
+        Example:
+        - Node.js version: 22.x
+        - Package version: 0.1.0
+        - Environment variables: KINSTA_API_KEY, KINSTA_COMPANY_ID
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context that might help answer your question
+    validations:
+      required: false
