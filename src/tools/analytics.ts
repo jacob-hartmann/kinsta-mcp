@@ -5,7 +5,10 @@ import {
   formatAuthError,
   formatError,
   formatSuccess,
+  formatValidationError,
   buildParams,
+  kinstaOutputSchema,
+  validateId,
 } from "./utils.js";
 
 const analyticsInputSchema = z.object({
@@ -23,17 +26,27 @@ const analyticsInputSchema = z.object({
 function registerAnalyticsTool(
   server: McpServer,
   name: string,
+  title: string,
   description: string,
   pathSuffix: string
 ): void {
   server.registerTool(
     name,
     {
+      title,
       description,
       inputSchema: analyticsInputSchema,
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
+      const idError = validateId(args.env_id, "env_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -56,6 +69,7 @@ export function registerAnalyticsTools(server: McpServer): void {
   registerAnalyticsTool(
     server,
     "kinsta.analytics.visits",
+    "Get Visit Analytics",
     "Get visitor analytics for an environment over a date range.",
     "visits"
   );
@@ -63,6 +77,7 @@ export function registerAnalyticsTools(server: McpServer): void {
   registerAnalyticsTool(
     server,
     "kinsta.analytics.visits-usage",
+    "Get Visit Usage Analytics",
     "Get visitor usage analytics for an environment (billable visits).",
     "visits-usage"
   );
@@ -70,6 +85,7 @@ export function registerAnalyticsTools(server: McpServer): void {
   registerAnalyticsTool(
     server,
     "kinsta.analytics.bandwidth",
+    "Get Bandwidth Analytics",
     "Get bandwidth analytics for an environment over a date range.",
     "bandwidth"
   );
@@ -77,6 +93,7 @@ export function registerAnalyticsTools(server: McpServer): void {
   registerAnalyticsTool(
     server,
     "kinsta.analytics.bandwidth-usage",
+    "Get Bandwidth Usage Analytics",
     "Get bandwidth usage analytics for an environment (billable bandwidth).",
     "bandwidth-usage"
   );
@@ -84,6 +101,7 @@ export function registerAnalyticsTools(server: McpServer): void {
   registerAnalyticsTool(
     server,
     "kinsta.analytics.cdn-bandwidth",
+    "Get CDN Bandwidth Analytics",
     "Get CDN bandwidth analytics for an environment over a date range.",
     "cdn-bandwidth"
   );
@@ -91,6 +109,7 @@ export function registerAnalyticsTools(server: McpServer): void {
   registerAnalyticsTool(
     server,
     "kinsta.analytics.cdn-bandwidth-usage",
+    "Get CDN Bandwidth Usage",
     "Get CDN bandwidth usage analytics for an environment (billable CDN bandwidth).",
     "cdn-bandwidth-usage"
   );
@@ -98,6 +117,7 @@ export function registerAnalyticsTools(server: McpServer): void {
   registerAnalyticsTool(
     server,
     "kinsta.analytics.disk-space",
+    "Get Disk Space Analytics",
     "Get disk space usage analytics for an environment.",
     "disk-space"
   );

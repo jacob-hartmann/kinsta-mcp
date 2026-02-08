@@ -1,12 +1,18 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import { formatAuthError, formatError, formatSuccess } from "./utils.js";
+import {
+  formatAuthError,
+  formatError,
+  formatSuccess,
+  kinstaOutputSchema,
+} from "./utils.js";
 
 export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
     "kinsta.tools.clear-cache",
     {
+      title: "Clear Cache",
       description:
         "Clear the server cache for an environment. Returns an operation_id.",
       inputSchema: z.object({
@@ -14,6 +20,8 @@ export function registerSiteOperationTools(server: McpServer): void {
           .string()
           .describe("The environment ID to clear cache for"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -33,12 +41,15 @@ export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
     "kinsta.tools.restart-php",
     {
+      title: "Restart PHP",
       description: "Restart PHP for an environment. Returns an operation_id.",
       inputSchema: z.object({
         environment_id: z
           .string()
           .describe("The environment ID to restart PHP for"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -58,6 +69,7 @@ export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
     "kinsta.tools.php-version",
     {
+      title: "Change PHP Version",
       description:
         "Change the PHP version for an environment. Returns an operation_id.",
       inputSchema: z.object({
@@ -70,6 +82,8 @@ export function registerSiteOperationTools(server: McpServer): void {
           .optional()
           .describe("Opt out of automatic PHP updates"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -97,12 +111,18 @@ export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
     "kinsta.tools.denied-ips",
     {
+      title: "Get Denied IPs",
       description:
         "Get the list of denied (blocked) IP addresses for an environment.",
       inputSchema: z.object({
         environment_id: z.string().describe("The environment ID"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -122,12 +142,15 @@ export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
     "kinsta.tools.denied-ips.update",
     {
+      title: "Update Denied IPs",
       description:
         "Update the list of denied (blocked) IP addresses for an environment.",
       inputSchema: z.object({
         environment_id: z.string().describe("The environment ID"),
         ip_list: z.array(z.string()).describe("List of IP addresses to block"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
