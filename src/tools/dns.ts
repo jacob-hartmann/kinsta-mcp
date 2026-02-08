@@ -1,15 +1,28 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import { formatAuthError, formatError, formatSuccess } from "./utils.js";
+import {
+  formatAuthError,
+  formatError,
+  formatSuccess,
+  formatValidationError,
+  kinstaOutputSchema,
+  validateId,
+} from "./utils.js";
 
 export function registerDnsTools(server: McpServer): void {
   server.registerTool(
     "kinsta.dns.domains",
     {
+      title: "List DNS Domains",
       description: "List all DNS domains for your Kinsta company.",
       inputSchema: z.object({}),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (_args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -30,13 +43,22 @@ export function registerDnsTools(server: McpServer): void {
   server.registerTool(
     "kinsta.dns.records",
     {
+      title: "List DNS Records",
       description: "List all DNS records for a specific domain.",
       inputSchema: z.object({
         domain_id: z.string().describe("The domain ID to list DNS records for"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
+      const idError = validateId(args.domain_id, "domain_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -53,6 +75,7 @@ export function registerDnsTools(server: McpServer): void {
   server.registerTool(
     "kinsta.dns.records.create",
     {
+      title: "Create DNS Record",
       description: "Create a new DNS record for a domain.",
       inputSchema: z.object({
         domain_id: z.string().describe("The domain ID to create a record for"),
@@ -68,8 +91,13 @@ export function registerDnsTools(server: McpServer): void {
           .array(z.object({ value: z.string().describe("Record value") }))
           .describe("Array of resource record values"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
+      const idError = validateId(args.domain_id, "domain_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -92,6 +120,7 @@ export function registerDnsTools(server: McpServer): void {
   server.registerTool(
     "kinsta.dns.records.update",
     {
+      title: "Update DNS Record",
       description: "Update an existing DNS record for a domain.",
       inputSchema: z.object({
         domain_id: z.string().describe("The domain ID containing the record"),
@@ -113,8 +142,13 @@ export function registerDnsTools(server: McpServer): void {
           .optional()
           .describe("Resource records to remove"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
+      const idError = validateId(args.domain_id, "domain_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -142,15 +176,20 @@ export function registerDnsTools(server: McpServer): void {
   server.registerTool(
     "kinsta.dns.records.delete",
     {
+      title: "Delete DNS Record",
       description: "Delete a DNS record from a domain.",
       inputSchema: z.object({
         domain_id: z.string().describe("The domain ID containing the record"),
         type: z.string().describe("DNS record type to delete"),
         name: z.string().describe("DNS record name to delete"),
       }),
-      annotations: { destructiveHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: { destructiveHint: true, openWorldHint: true },
     },
     async (args, extra) => {
+      const idError = validateId(args.domain_id, "domain_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 

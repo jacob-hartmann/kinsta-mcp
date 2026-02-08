@@ -5,7 +5,6 @@
  *
  * - Sets `Authorization: Bearer <API_KEY>` on all requests
  * - Centralizes error mapping into typed KinstaClientError
- * - Captures RateLimit-* headers when present
  * - Uses AbortController for request timeouts
  */
 
@@ -102,11 +101,24 @@ export class KinstaClient {
 
       // Map HTTP status to typed error
       if (!response.ok) {
-        return { success: false, error: this.mapHttpError(response) };
+        return { success: false, error: await this.mapHttpError(response) };
       }
 
-      // Parse response
-      const data = (await response.json()) as T;
+      // Parse response — guard against non-JSON bodies
+      let data: T;
+      try {
+        data = (await response.json()) as T;
+      } catch {
+        return {
+          success: false,
+          error: new KinstaClientError(
+            "Received non-JSON response from the Kinsta API",
+            "UNKNOWN",
+            response.status,
+            false
+          ),
+        };
+      }
       return { success: true, data };
     } catch (err) {
       return { success: false, error: this.mapNetworkError(err) };
@@ -119,52 +131,72 @@ export class KinstaClient {
   // Error Mapping
   // -------------------------------------------------------------------------
 
-  private mapHttpError(response: Response): KinstaClientError {
+  private async mapHttpError(response: Response): Promise<KinstaClientError> {
     const status = response.status;
+
+    // Try to extract API error message from response body
+    let apiMessage: string | undefined;
+    try {
+      const body = (await response.json()) as Record<string, unknown>;
+      const msg = body["message"] ?? body["error"];
+      if (typeof msg === "string") {
+        apiMessage = msg;
+      }
+    } catch {
+      // Non-JSON error body — proceed without apiMessage
+    }
+
+    const suffix = apiMessage ? `: ${apiMessage}` : "";
 
     switch (status) {
       case 401:
         return new KinstaClientError(
-          "Invalid or expired API key",
+          `Invalid or expired API key${suffix}`,
           "UNAUTHORIZED",
           status,
-          false
+          false,
+          apiMessage
         );
       case 403:
         return new KinstaClientError(
-          "Your API key does not have permission to access this resource",
+          `Your API key does not have permission to access this resource${suffix}`,
           "FORBIDDEN",
           status,
-          false
+          false,
+          apiMessage
         );
       case 404:
         return new KinstaClientError(
-          "Resource not found",
+          `Resource not found${suffix}`,
           "NOT_FOUND",
           status,
-          false
+          false,
+          apiMessage
         );
       case 429:
         return new KinstaClientError(
-          "Rate limit exceeded. Please wait before retrying.",
+          `Rate limit exceeded. Please wait before retrying.${suffix}`,
           "RATE_LIMITED",
           status,
-          true
+          true,
+          apiMessage
         );
       default:
         if (status >= 400 && status < 500) {
           return new KinstaClientError(
-            `Client error (${status})`,
+            `Client error (${status})${suffix}`,
             "VALIDATION_ERROR",
             status,
-            false
+            false,
+            apiMessage
           );
         }
         return new KinstaClientError(
-          `Server error (${status})`,
+          `Server error (${status})${suffix}`,
           "SERVER_ERROR",
           status,
-          true
+          true,
+          apiMessage
         );
     }
   }

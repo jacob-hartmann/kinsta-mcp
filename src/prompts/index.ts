@@ -14,6 +14,7 @@ export function registerPrompts(server: McpServer): void {
   server.registerPrompt(
     "deploy-site",
     {
+      title: "Deploy Site",
       description: "Guide through creating a new WordPress site on Kinsta",
       argsSchema: {
         site_name: z.string().describe("Name for the new site"),
@@ -48,6 +49,7 @@ export function registerPrompts(server: McpServer): void {
   server.registerPrompt(
     "manage-backups",
     {
+      title: "Manage Backups",
       description: "Guide for backup list, create, and restore workflows",
       argsSchema: {
         env_id: z.string().describe("The environment ID to manage backups for"),
@@ -78,6 +80,7 @@ export function registerPrompts(server: McpServer): void {
   server.registerPrompt(
     "push-environment",
     {
+      title: "Push Environment",
       description:
         "Guide for pushing changes between environments (e.g. staging to live)",
       argsSchema: {
@@ -109,6 +112,7 @@ export function registerPrompts(server: McpServer): void {
   server.registerPrompt(
     "setup-domain",
     {
+      title: "Set Up Domain",
       description: "Guide for adding a custom domain to a Kinsta environment",
       argsSchema: {
         env_id: z.string().describe("The environment ID to add the domain to"),
