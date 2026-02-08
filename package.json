@@ -1,6 +1,6 @@
 {
   "name": "kinsta-mcp",
-  "version": "0.1.0-rc.0",
+  "version": "1.0.0-rc.1",
   "description": "Model Context Protocol (MCP) server for Kinsta WordPress hosting",
   "type": "module",
   "main": "./dist/index.js",
