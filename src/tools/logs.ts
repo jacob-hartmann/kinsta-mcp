@@ -5,13 +5,17 @@ import {
   formatAuthError,
   formatError,
   formatSuccess,
+  formatValidationError,
   buildParams,
+  kinstaOutputSchema,
+  validateId,
 } from "./utils.js";
 
 export function registerLogTools(server: McpServer): void {
   server.registerTool(
     "kinsta.logs.get",
     {
+      title: "Get Logs",
       description:
         "Get log file contents for an environment. Supports error.log and access.log.",
       inputSchema: z.object({
@@ -22,9 +26,17 @@ export function registerLogTools(server: McpServer): void {
           .describe("Log file name (e.g. error.log, access.log)"),
         lines: z.number().optional().describe("Number of log lines to return"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
+      const idError = validateId(args.env_id, "env_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 

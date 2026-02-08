@@ -3,6 +3,8 @@
  *
  * Shared factory for creating KinstaClient instances from MCP request context.
  * Used by both tools and resources to avoid code duplication.
+ *
+ * Caches the client instance and invalidates when env vars change.
  */
 
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
@@ -20,10 +22,22 @@ export type KinstaClientResult =
   | { success: true; client: KinstaClient }
   | { success: false; error: string };
 
+// ---------------------------------------------------------------------------
+// Client Cache
+// ---------------------------------------------------------------------------
+
+let cachedClient: KinstaClient | undefined;
+let cachedConfigHash: string | undefined;
+
+function getConfigHash(): string {
+  return `${process.env["KINSTA_API_KEY"] ?? ""}:${process.env["KINSTA_COMPANY_ID"] ?? ""}:${process.env["KINSTA_API_BASE_URL"] ?? ""}`;
+}
+
 /**
  * Get a KinstaClient from MCP request context.
  *
  * Loads API key and company ID from environment variables.
+ * Caches the instance and invalidates if env vars change.
  *
  * @param _extra - MCP request handler extra context (reserved for future use)
  * @returns Result with client or error message
@@ -32,9 +46,20 @@ export function getKinstaClient(
   _extra: RequestHandlerExtra<ServerRequest, ServerNotification>
 ): KinstaClientResult {
   try {
+    const hash = getConfigHash();
+    if (cachedClient && cachedConfigHash === hash) {
+      return { success: true, client: cachedClient };
+    }
+
     const config = loadKinstaConfig();
-    return { success: true, client: new KinstaClient(config) };
+    cachedClient = new KinstaClient(config);
+    cachedConfigHash = hash;
+    return { success: true, client: cachedClient };
   } catch (err) {
+    // Invalidate cache on error
+    cachedClient = undefined;
+    cachedConfigHash = undefined;
+
     if (err instanceof KinstaAuthError) {
       return { success: false, error: err.message };
     }
