@@ -117,155 +117,155 @@ The server provides **83 tools** organized by category:
 
 #### Authentication
 
-| Tool                 | Description                                                                  |
-| -------------------- | ---------------------------------------------------------------------------- |
+| Tool                   | Description                                                                 |
+| ---------------------- | --------------------------------------------------------------------------- |
 | `kinsta.auth.validate` | Validate the current Kinsta API key and return account information if valid |
 
 #### Operations
 
-| Tool                     | Description                                                     |
-| ------------------------ | --------------------------------------------------------------- |
+| Tool                       | Description                                                          |
+| -------------------------- | -------------------------------------------------------------------- |
 | `kinsta.operations.status` | Check the status of an asynchronous Kinsta operation by operation ID |
 
 #### Company
 
-| Tool                          | Description                                                                 |
-| ----------------------------- | --------------------------------------------------------------------------- |
-| `kinsta.company.users`        | List all users in your Kinsta company                                       |
-| `kinsta.company.regions`      | List all available deployment regions for your Kinsta company               |
-| `kinsta.company.api-keys`     | List all API keys for your Kinsta company                                   |
-| `kinsta.company.activity-logs`| List company activity logs (supports filtering and pagination)              |
-| `kinsta.company.plugins`      | List WordPress plugins across all sites (supports search/filter/pagination) |
-| `kinsta.company.themes`       | List WordPress themes across all sites (supports search/filter/pagination)  |
+| Tool                           | Description                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------- |
+| `kinsta.company.users`         | List all users in your Kinsta company                                       |
+| `kinsta.company.regions`       | List all available deployment regions for your Kinsta company               |
+| `kinsta.company.api-keys`      | List all API keys for your Kinsta company                                   |
+| `kinsta.company.activity-logs` | List company activity logs (supports filtering and pagination)              |
+| `kinsta.company.plugins`       | List WordPress plugins across all sites (supports search/filter/pagination) |
+| `kinsta.company.themes`        | List WordPress themes across all sites (supports search/filter/pagination)  |
 
 #### Sites
 
-| Tool                    | Description                                                                 |
-| ----------------------- | --------------------------------------------------------------------------- |
-| `kinsta.sites.list`     | List all WordPress sites (optionally include environment details)           |
-| `kinsta.sites.get`      | Get details for a specific Kinsta site by ID                                |
-| `kinsta.sites.create`   | Create a new WordPress site (returns an `operation_id`)                     |
+| Tool                        | Description                                                                             |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| `kinsta.sites.list`         | List all WordPress sites (optionally include environment details)                       |
+| `kinsta.sites.get`          | Get details for a specific Kinsta site by ID                                            |
+| `kinsta.sites.create`       | Create a new WordPress site (returns an `operation_id`)                                 |
 | `kinsta.sites.create-plain` | Create a new plain (empty) site without WordPress installed (returns an `operation_id`) |
-| `kinsta.sites.clone`    | Clone an existing site (returns an `operation_id`)                          |
-| `kinsta.sites.delete`   | Delete a Kinsta site permanently (cannot be undone)                         |
-| `kinsta.sites.reset`    | Reset a site to a fresh WordPress install (destructive)                     |
+| `kinsta.sites.clone`        | Clone an existing site (returns an `operation_id`)                                      |
+| `kinsta.sites.delete`       | Delete a Kinsta site permanently (cannot be undone)                                     |
+| `kinsta.sites.reset`        | Reset a site to a fresh WordPress install (destructive)                                 |
 
 #### Environments
 
-| Tool                                   | Description                                                                 |
-| -------------------------------------- | --------------------------------------------------------------------------- |
-| `kinsta.environments.list`             | List all environments for a site                                            |
-| `kinsta.environments.create`           | Create a new WordPress environment for a site (returns an `operation_id`)   |
-| `kinsta.environments.create-plain`     | Create a new plain (empty) environment for a site (returns an `operation_id`) |
-| `kinsta.environments.clone`            | Clone an existing environment (returns an `operation_id`)                   |
-| `kinsta.environments.push`             | Push one environment to another (destructive; returns an `operation_id`)    |
-| `kinsta.environments.delete`           | Delete an environment (cannot be undone)                                    |
-| `kinsta.environments.php-allocation`   | Change PHP worker allocation for an environment (returns an `operation_id`) |
-| `kinsta.environments.php-allocation-site` | Change PHP worker allocation for all environments in a site (returns an `operation_id`) |
-| `kinsta.environments.webroot`          | Change the webroot subfolder for an environment (returns an `operation_id`) |
-| `kinsta.environments.files`            | List files in an environment's file system                                  |
-| `kinsta.environments.redirects`        | List redirect rules for an environment (supports filtering/pagination)      |
-| `kinsta.environments.redirects.update` | Create, update, or delete redirect rules for an environment                 |
-| `kinsta.environments.ssh.status`       | Get SSH/SFTP status for an environment                                      |
-| `kinsta.environments.ssh.toggle`       | Enable or disable SSH/SFTP access for an environment                        |
-| `kinsta.environments.ssh.password-access` | Enable or disable SSH password-based access                                 |
-| `kinsta.environments.ssh.generate-password` | Generate a new SSH/SFTP password                                           |
-| `kinsta.environments.ssh.password`     | Get the current SSH/SFTP password                                           |
-| `kinsta.environments.ssh.ip-allowlist` | Get the SSH IP allowlist                                                   |
-| `kinsta.environments.ssh.ip-allowlist.update` | Update the SSH IP allowlist                                          |
-| `kinsta.environments.ssh.config`       | Get SSH connection configuration for an environment                          |
-| `kinsta.environments.ssh.password-expiration` | Change SSH password expiration interval                               |
-| `kinsta.environments.wp-cli`           | Run a WP-CLI command on an environment (must start with `wp `)              |
-| `kinsta.environments.phpmyadmin`       | Get a phpMyAdmin login token for an environment                              |
+| Tool                                          | Description                                                                             |
+| --------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `kinsta.environments.list`                    | List all environments for a site                                                        |
+| `kinsta.environments.create`                  | Create a new WordPress environment for a site (returns an `operation_id`)               |
+| `kinsta.environments.create-plain`            | Create a new plain (empty) environment for a site (returns an `operation_id`)           |
+| `kinsta.environments.clone`                   | Clone an existing environment (returns an `operation_id`)                               |
+| `kinsta.environments.push`                    | Push one environment to another (destructive; returns an `operation_id`)                |
+| `kinsta.environments.delete`                  | Delete an environment (cannot be undone)                                                |
+| `kinsta.environments.php-allocation`          | Change PHP worker allocation for an environment (returns an `operation_id`)             |
+| `kinsta.environments.php-allocation-site`     | Change PHP worker allocation for all environments in a site (returns an `operation_id`) |
+| `kinsta.environments.webroot`                 | Change the webroot subfolder for an environment (returns an `operation_id`)             |
+| `kinsta.environments.files`                   | List files in an environment's file system                                              |
+| `kinsta.environments.redirects`               | List redirect rules for an environment (supports filtering/pagination)                  |
+| `kinsta.environments.redirects.update`        | Create, update, or delete redirect rules for an environment                             |
+| `kinsta.environments.ssh.status`              | Get SSH/SFTP status for an environment                                                  |
+| `kinsta.environments.ssh.toggle`              | Enable or disable SSH/SFTP access for an environment                                    |
+| `kinsta.environments.ssh.password-access`     | Enable or disable SSH password-based access                                             |
+| `kinsta.environments.ssh.generate-password`   | Generate a new SSH/SFTP password                                                        |
+| `kinsta.environments.ssh.password`            | Get the current SSH/SFTP password                                                       |
+| `kinsta.environments.ssh.ip-allowlist`        | Get the SSH IP allowlist                                                                |
+| `kinsta.environments.ssh.ip-allowlist.update` | Update the SSH IP allowlist                                                             |
+| `kinsta.environments.ssh.config`              | Get SSH connection configuration for an environment                                     |
+| `kinsta.environments.ssh.password-expiration` | Change SSH password expiration interval                                                 |
+| `kinsta.environments.wp-cli`                  | Run a WP-CLI command on an environment (must start with `wp `)                          |
+| `kinsta.environments.phpmyadmin`              | Get a phpMyAdmin login token for an environment                                         |
 
 #### Site Tools
 
-| Tool                          | Description                                              |
-| ----------------------------- | -------------------------------------------------------- |
-| `kinsta.tools.clear-cache`    | Clear the server cache for an environment (returns an `operation_id`) |
-| `kinsta.tools.restart-php`    | Restart PHP for an environment (returns an `operation_id`) |
-| `kinsta.tools.php-version`    | Change the PHP version for an environment (returns an `operation_id`) |
-| `kinsta.tools.denied-ips`     | Get the list of denied (blocked) IP addresses for an environment |
-| `kinsta.tools.denied-ips.update` | Update the list of denied (blocked) IP addresses for an environment |
+| Tool                             | Description                                                           |
+| -------------------------------- | --------------------------------------------------------------------- |
+| `kinsta.tools.clear-cache`       | Clear the server cache for an environment (returns an `operation_id`) |
+| `kinsta.tools.restart-php`       | Restart PHP for an environment (returns an `operation_id`)            |
+| `kinsta.tools.php-version`       | Change the PHP version for an environment (returns an `operation_id`) |
+| `kinsta.tools.denied-ips`        | Get the list of denied (blocked) IP addresses for an environment      |
+| `kinsta.tools.denied-ips.update` | Update the list of denied (blocked) IP addresses for an environment   |
 
 #### Plugins & Themes
 
-| Tool                        | Description                                                        |
-| --------------------------- | ------------------------------------------------------------------ |
-| `kinsta.plugins.list`       | List all plugins for an environment                                |
-| `kinsta.plugins.update`     | Update a single plugin (returns an `operation_id`)                 |
-| `kinsta.plugins.bulk-update`| Update multiple plugins at once (returns an `operation_id`)        |
-| `kinsta.plugins.list-wp`    | List plugins with details from the WordPress.org repository         |
-| `kinsta.themes.list`        | List all themes for an environment                                 |
-| `kinsta.themes.update`      | Update a single theme (returns an `operation_id`)                  |
-| `kinsta.themes.bulk-update` | Update multiple themes at once (returns an `operation_id`)         |
-| `kinsta.themes.list-wp`     | List themes with details from the WordPress.org repository          |
+| Tool                         | Description                                                 |
+| ---------------------------- | ----------------------------------------------------------- |
+| `kinsta.plugins.list`        | List all plugins for an environment                         |
+| `kinsta.plugins.update`      | Update a single plugin (returns an `operation_id`)          |
+| `kinsta.plugins.bulk-update` | Update multiple plugins at once (returns an `operation_id`) |
+| `kinsta.plugins.list-wp`     | List plugins with details from the WordPress.org repository |
+| `kinsta.themes.list`         | List all themes for an environment                          |
+| `kinsta.themes.update`       | Update a single theme (returns an `operation_id`)           |
+| `kinsta.themes.bulk-update`  | Update multiple themes at once (returns an `operation_id`)  |
+| `kinsta.themes.list-wp`      | List themes with details from the WordPress.org repository  |
 
 #### Domains
 
-| Tool                        | Description                                    |
-| --------------------------- | ---------------------------------------------- |
-| `kinsta.domains.list`       | List all custom domains for an environment     |
-| `kinsta.domains.add`        | Add a custom domain to an environment          |
-| `kinsta.domains.delete`     | Remove custom domains from an environment      |
-| `kinsta.domains.verification` | Get DNS verification records for a domain    |
-| `kinsta.domains.set-primary`  | Set the primary domain for an environment    |
+| Tool                          | Description                                |
+| ----------------------------- | ------------------------------------------ |
+| `kinsta.domains.list`         | List all custom domains for an environment |
+| `kinsta.domains.add`          | Add a custom domain to an environment      |
+| `kinsta.domains.delete`       | Remove custom domains from an environment  |
+| `kinsta.domains.verification` | Get DNS verification records for a domain  |
+| `kinsta.domains.set-primary`  | Set the primary domain for an environment  |
 
 #### DNS (Kinsta DNS)
 
-| Tool                         | Description                              |
-| ---------------------------- | ---------------------------------------- |
-| `kinsta.dns.domains`         | List all DNS domains for your company    |
-| `kinsta.dns.records`         | List DNS records for a domain            |
-| `kinsta.dns.records.create`  | Create a new DNS record                  |
-| `kinsta.dns.records.update`  | Update an existing DNS record            |
-| `kinsta.dns.records.delete`  | Delete a DNS record                      |
+| Tool                        | Description                           |
+| --------------------------- | ------------------------------------- |
+| `kinsta.dns.domains`        | List all DNS domains for your company |
+| `kinsta.dns.records`        | List DNS records for a domain         |
+| `kinsta.dns.records.create` | Create a new DNS record               |
+| `kinsta.dns.records.update` | Update an existing DNS record         |
+| `kinsta.dns.records.delete` | Delete a DNS record                   |
 
 #### Edge Cache & CDN
 
-| Tool                         | Description                                         |
-| ---------------------------- | --------------------------------------------------- |
-| `kinsta.edge-cache.clear`    | Clear the edge cache for an environment (returns an `operation_id`) |
-| `kinsta.edge-cache.toggle`   | Enable or disable edge caching for an environment   |
-| `kinsta.cdn.clear-cache`     | Clear the CDN cache for an environment (returns an `operation_id`) |
-| `kinsta.cdn.image-optimization` | Configure CDN image optimization settings         |
+| Tool                            | Description                                                         |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `kinsta.edge-cache.clear`       | Clear the edge cache for an environment (returns an `operation_id`) |
+| `kinsta.edge-cache.toggle`      | Enable or disable edge caching for an environment                   |
+| `kinsta.cdn.clear-cache`        | Clear the CDN cache for an environment (returns an `operation_id`)  |
+| `kinsta.cdn.image-optimization` | Configure CDN image optimization settings                           |
 
 #### SFTP Users
 
-| Tool                     | Description                                             |
-| ------------------------ | ------------------------------------------------------- |
-| `kinsta.sftp-users.list` | List additional SFTP/SSH user accounts for an environment |
-| `kinsta.sftp-users.toggle` | Enable or disable additional SFTP/SSH accounts         |
-| `kinsta.sftp-users.add`  | Add a new additional SFTP/SSH user account              |
-| `kinsta.sftp-users.remove` | Remove an additional SFTP/SSH user account             |
+| Tool                       | Description                                               |
+| -------------------------- | --------------------------------------------------------- |
+| `kinsta.sftp-users.list`   | List additional SFTP/SSH user accounts for an environment |
+| `kinsta.sftp-users.toggle` | Enable or disable additional SFTP/SSH accounts            |
+| `kinsta.sftp-users.add`    | Add a new additional SFTP/SSH user account                |
+| `kinsta.sftp-users.remove` | Remove an additional SFTP/SSH user account                |
 
 #### Backups
 
-| Tool                         | Description                                                      |
-| ---------------------------- | ---------------------------------------------------------------- |
-| `kinsta.backups.list`        | List all backups for an environment                              |
-| `kinsta.backups.downloadable`| List downloadable backups for an environment                     |
-| `kinsta.backups.create`      | Create a manual backup (returns an `operation_id`)               |
-| `kinsta.backups.restore`     | Restore an environment from a backup (destructive; returns an `operation_id`) |
-| `kinsta.backups.delete`      | Delete a backup (cannot be undone)                               |
+| Tool                          | Description                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------- |
+| `kinsta.backups.list`         | List all backups for an environment                                           |
+| `kinsta.backups.downloadable` | List downloadable backups for an environment                                  |
+| `kinsta.backups.create`       | Create a manual backup (returns an `operation_id`)                            |
+| `kinsta.backups.restore`      | Restore an environment from a backup (destructive; returns an `operation_id`) |
+| `kinsta.backups.delete`       | Delete a backup (cannot be undone)                                            |
 
 #### Analytics
 
-| Tool                                | Description                                                     |
-| ----------------------------------- | --------------------------------------------------------------- |
-| `kinsta.analytics.visits`           | Get visitor analytics for an environment over a date range       |
-| `kinsta.analytics.visits-usage`     | Get visitor usage analytics (billable visits)                    |
-| `kinsta.analytics.bandwidth`        | Get bandwidth analytics for an environment over a date range     |
-| `kinsta.analytics.bandwidth-usage`  | Get bandwidth usage analytics (billable bandwidth)               |
-| `kinsta.analytics.cdn-bandwidth`    | Get CDN bandwidth analytics for an environment over a date range |
-| `kinsta.analytics.cdn-bandwidth-usage` | Get CDN bandwidth usage analytics (billable CDN bandwidth)   |
-| `kinsta.analytics.disk-space`       | Get disk space usage analytics for an environment                |
+| Tool                                   | Description                                                      |
+| -------------------------------------- | ---------------------------------------------------------------- |
+| `kinsta.analytics.visits`              | Get visitor analytics for an environment over a date range       |
+| `kinsta.analytics.visits-usage`        | Get visitor usage analytics (billable visits)                    |
+| `kinsta.analytics.bandwidth`           | Get bandwidth analytics for an environment over a date range     |
+| `kinsta.analytics.bandwidth-usage`     | Get bandwidth usage analytics (billable bandwidth)               |
+| `kinsta.analytics.cdn-bandwidth`       | Get CDN bandwidth analytics for an environment over a date range |
+| `kinsta.analytics.cdn-bandwidth-usage` | Get CDN bandwidth usage analytics (billable CDN bandwidth)       |
+| `kinsta.analytics.disk-space`          | Get disk space usage analytics for an environment                |
 
 #### Logs
 
-| Tool             | Description                                               |
-| ---------------- | --------------------------------------------------------- |
-| `kinsta.logs.get`| Get log file contents for an environment                  |
+| Tool              | Description                              |
+| ----------------- | ---------------------------------------- |
+| `kinsta.logs.get` | Get log file contents for an environment |
 
 ### Resources
 
@@ -273,28 +273,28 @@ The server exposes data as MCP resources:
 
 #### Static Resources
 
-| Resource URI      | Description                                   |
-| ----------------- | --------------------------------------------- |
-| `kinsta://sites`  | List all WordPress sites in your Kinsta company |
-| `kinsta://regions`| List available deployment regions             |
+| Resource URI       | Description                                     |
+| ------------------ | ----------------------------------------------- |
+| `kinsta://sites`   | List all WordPress sites in your Kinsta company |
+| `kinsta://regions` | List available deployment regions               |
 
 #### Resource Templates
 
-| Resource URI                           | Description                          |
-| -------------------------------------- | ------------------------------------ |
-| `kinsta://sites/{site_id}`             | Details for a specific site          |
-| `kinsta://sites/{site_id}/environments`| Environments for a specific site     |
+| Resource URI                            | Description                      |
+| --------------------------------------- | -------------------------------- |
+| `kinsta://sites/{site_id}`              | Details for a specific site      |
+| `kinsta://sites/{site_id}/environments` | Environments for a specific site |
 
 ### Prompts
 
 The server provides guided prompts for common workflows:
 
-| Prompt              | Description                                                   |
-| ------------------- | ------------------------------------------------------------- |
-| `deploy-site`       | Guide through creating a new WordPress site on Kinsta          |
-| `manage-backups`    | Guide for backup list, create, restore, download, and delete workflows |
-| `push-environment`  | Guide for pushing changes between environments (e.g. staging to live) |
-| `setup-domain`      | Guide for adding a custom domain to a Kinsta environment       |
+| Prompt             | Description                                                            |
+| ------------------ | ---------------------------------------------------------------------- |
+| `deploy-site`      | Guide through creating a new WordPress site on Kinsta                  |
+| `manage-backups`   | Guide for backup list, create, restore, download, and delete workflows |
+| `push-environment` | Guide for pushing changes between environments (e.g. staging to live)  |
+| `setup-domain`     | Guide for adding a custom domain to a Kinsta environment               |
 
 ## Development
 

@@ -271,7 +271,7 @@ export function registerSiteTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/${args.site_id}/reset-site`,
+        path: `/sites/${args.site_id}/reset`,
         method: "POST",
         body: {
           admin_password: args.admin_password,

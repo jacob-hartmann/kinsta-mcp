@@ -34,7 +34,7 @@ export function registerDomainTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/domains`,
+        path: `/environments/${args.env_id}/domains`,
         method: "GET",
       });
 
@@ -65,7 +65,7 @@ export function registerDomainTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/domains`,
+        path: `/environments/${args.env_id}/domains`,
         method: "POST",
         body: { domain_name: args.domain_name },
       });
@@ -97,7 +97,7 @@ export function registerDomainTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/domains`,
+        path: `/environments/${args.env_id}/domains`,
         method: "DELETE",
         body: { domain_ids: args.domain_ids },
       });
@@ -132,7 +132,7 @@ export function registerDomainTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/domains/${args.domain_id}/verification-records`,
+        path: `/domains/${args.domain_id}/verification-records`,
         method: "GET",
       });
 
@@ -161,7 +161,7 @@ export function registerDomainTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/domains/primary`,
+        path: `/environments/${args.env_id}/primary-domain`,
         method: "PUT",
         body: { domain_id: args.domain_id },
       });

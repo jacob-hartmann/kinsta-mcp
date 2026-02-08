@@ -324,7 +324,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/change-environment-php-allocation`,
+        path: `/environments/${args.env_id}/php-allocation`,
         method: "POST",
         body: {
           thread_count: args.thread_count,
@@ -361,7 +361,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/${args.site_id}/change-site-php-allocation`,
+        path: `/sites/${args.site_id}/php-allocation`,
         method: "POST",
         body: {
           thread_count: args.thread_count,
@@ -411,7 +411,7 @@ export function registerEnvironmentTools(server: McpServer): void {
         body["refresh_plugins_and_themes"] = args.refresh_plugins_and_themes;
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/change-webroot-subfolder`,
+        path: `/environments/${args.env_id}/webroot`,
         method: "POST",
         body,
       });
@@ -448,7 +448,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/file-list`,
+        path: `/environments/${args.env_id}/files`,
         method: "GET",
       });
 
@@ -496,7 +496,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/redirect-rules`,
+        path: `/environments/${args.env_id}/redirect-rules`,
         method: "GET",
         params: buildParams({
           limit: args.limit?.toString(),
@@ -574,7 +574,7 @@ export function registerEnvironmentTools(server: McpServer): void {
         body["regex_search"] = args.regex_search;
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/redirect-rules`,
+        path: `/environments/${args.env_id}/redirect-rules`,
         method: "POST",
         body,
       });
@@ -611,7 +611,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/ssh/get-status`,
+        path: `/environments/${args.env_id}/sftp-ssh/status`,
         method: "GET",
       });
 
@@ -642,7 +642,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/ssh/set-status`,
+        path: `/environments/${args.env_id}/sftp-ssh`,
         method: "POST",
         body: { is_enabled: args.is_enabled },
       });
@@ -706,7 +706,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/ssh/generate-password`,
+        path: `/environments/${args.env_id}/sftp-password`,
         method: "POST",
       });
 
@@ -738,7 +738,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/ssh/password`,
+        path: `/environments/${args.env_id}/sftp-password`,
         method: "GET",
       });
 
@@ -770,7 +770,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/ssh/get-allowed-ips`,
+        path: `/environments/${args.env_id}/sftp-allowlist`,
         method: "GET",
       });
 
@@ -801,7 +801,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/ssh/set-allowed-ips`,
+        path: `/environments/${args.env_id}/sftp-allowlist`,
         method: "POST",
         body: { ip_allowlist: args.ip_allowlist },
       });
@@ -817,7 +817,6 @@ export function registerEnvironmentTools(server: McpServer): void {
       title: "Get SSH Config",
       description: "Get SSH connection configuration for an environment.",
       inputSchema: z.object({
-        site_id: z.string().describe("The site ID"),
         env_id: z.string().describe("The environment ID"),
       }),
       outputSchema: kinstaOutputSchema,
@@ -828,8 +827,6 @@ export function registerEnvironmentTools(server: McpServer): void {
       },
     },
     async (args, extra) => {
-      const siteIdError = validateId(args.site_id, "site_id");
-      if (siteIdError) return formatValidationError(siteIdError);
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
 
@@ -837,7 +834,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/${args.site_id}/environments/${args.env_id}/ssh/config`,
+        path: `/environments/${args.env_id}/sftp-config`,
         method: "GET",
       });
 
@@ -871,7 +868,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/ssh/change-expiration-interval`,
+        path: `/environments/${args.env_id}/sftp-expiration`,
         method: "POST",
         body: { exp_interval: args.exp_interval },
       });
@@ -912,7 +909,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/run-wp-cli-command`,
+        path: `/environments/${args.env_id}/wp-cli`,
         method: "POST",
         body: { wp_command: args.wp_command },
       });
@@ -942,7 +939,7 @@ export function registerEnvironmentTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/pma-login-token`,
+        path: `/environments/${args.env_id}/phpmyadmin-login`,
         method: "POST",
       });
 

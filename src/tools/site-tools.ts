@@ -56,9 +56,8 @@ export function registerSiteOperationTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: "/sites/tools/restart-php",
+        path: `/environments/${args.environment_id}/php/restart`,
         method: "POST",
-        body: { environment_id: args.environment_id },
       });
 
       if (!result.success) return formatError(result.error, "environment");
@@ -90,7 +89,6 @@ export function registerSiteOperationTools(server: McpServer): void {
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const body: Record<string, unknown> = {
-        environment_id: args.environment_id,
         php_version: args.php_version,
       };
       if (args.is_opt_out_from_automatic_php_update !== undefined)
@@ -98,7 +96,7 @@ export function registerSiteOperationTools(server: McpServer): void {
           args.is_opt_out_from_automatic_php_update;
 
       const result = await clientResult.client.request<unknown>({
-        path: "/sites/tools/modify-php-version",
+        path: `/environments/${args.environment_id}/php/version`,
         method: "PUT",
         body,
       });
