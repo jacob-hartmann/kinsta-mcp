@@ -5,13 +5,17 @@ import {
   formatAuthError,
   formatError,
   formatSuccess,
+  formatValidationError,
   buildParams,
+  kinstaOutputSchema,
+  validateId,
 } from "./utils.js";
 
 export function registerSiteTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sites.list",
     {
+      title: "List Sites",
       description:
         "List all WordPress sites in your Kinsta company. Optionally include environment details.",
       inputSchema: z.object({
@@ -20,7 +24,12 @@ export function registerSiteTools(server: McpServer): void {
           .optional()
           .describe("Include environment details for each site"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -44,13 +53,22 @@ export function registerSiteTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sites.get",
     {
+      title: "Get Site",
       description: "Get details for a specific Kinsta site by its ID.",
       inputSchema: z.object({
         site_id: z.string().describe("The site ID to retrieve"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
+      const idError = validateId(args.site_id, "site_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -67,6 +85,7 @@ export function registerSiteTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sites.create",
     {
+      title: "Create Site",
       description:
         "Create a new WordPress site on Kinsta. Returns an operation_id to track progress.",
       inputSchema: z.object({
@@ -94,6 +113,8 @@ export function registerSiteTools(server: McpServer): void {
         woocommerce: z.boolean().optional().describe("Install WooCommerce"),
         wordpressseo: z.boolean().optional().describe("Install Yoast SEO"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -133,12 +154,15 @@ export function registerSiteTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sites.create-plain",
     {
+      title: "Create Plain Site",
       description:
         "Create a new plain (empty) site on Kinsta without WordPress installed. Returns an operation_id.",
       inputSchema: z.object({
         display_name: z.string().describe("Display name for the new site"),
         region: z.string().describe("Deployment region"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -163,6 +187,7 @@ export function registerSiteTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sites.clone",
     {
+      title: "Clone Site",
       description:
         "Clone an existing site to create a new site. Returns an operation_id.",
       inputSchema: z.object({
@@ -171,6 +196,8 @@ export function registerSiteTools(server: McpServer): void {
           .string()
           .describe("Source environment ID to clone from"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -195,14 +222,19 @@ export function registerSiteTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sites.delete",
     {
+      title: "Delete Site",
       description:
         "Delete a Kinsta site permanently. This action cannot be undone.",
       inputSchema: z.object({
         site_id: z.string().describe("The site ID to delete"),
       }),
-      annotations: { destructiveHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: { destructiveHint: true, openWorldHint: true },
     },
     async (args, extra) => {
+      const idError = validateId(args.site_id, "site_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -219,6 +251,7 @@ export function registerSiteTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sites.reset",
     {
+      title: "Reset Site",
       description:
         "Reset a Kinsta site to a fresh WordPress install. This removes all existing data.",
       inputSchema: z.object({
@@ -227,14 +260,18 @@ export function registerSiteTools(server: McpServer): void {
           .string()
           .describe("New WordPress admin password after reset"),
       }),
-      annotations: { destructiveHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: { destructiveHint: true, openWorldHint: true },
     },
     async (args, extra) => {
+      const idError = validateId(args.site_id, "site_id");
+      if (idError) return formatValidationError(idError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/${args.site_id}/reset-site`,
+        path: `/sites/${args.site_id}/reset`,
         method: "POST",
         body: {
           admin_password: args.admin_password,

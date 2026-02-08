@@ -6,15 +6,22 @@ import {
   formatError,
   formatSuccess,
   buildParams,
+  kinstaOutputSchema,
 } from "./utils.js";
 
 export function registerCompanyTools(server: McpServer): void {
   server.registerTool(
     "kinsta.company.users",
     {
+      title: "List Company Users",
       description: "List all users in your Kinsta company.",
       inputSchema: z.object({}),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (_args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -34,10 +41,16 @@ export function registerCompanyTools(server: McpServer): void {
   server.registerTool(
     "kinsta.company.regions",
     {
+      title: "List Available Regions",
       description:
         "List all available deployment regions for your Kinsta company.",
       inputSchema: z.object({}),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (_args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -57,9 +70,15 @@ export function registerCompanyTools(server: McpServer): void {
   server.registerTool(
     "kinsta.company.api-keys",
     {
+      title: "List API Keys",
       description: "List all API keys for your Kinsta company.",
       inputSchema: z.object({}),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (_args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -79,21 +98,42 @@ export function registerCompanyTools(server: McpServer): void {
   server.registerTool(
     "kinsta.company.activity-logs",
     {
+      title: "List Activity Logs",
       description:
         "List activity logs for your Kinsta company. Supports filtering and pagination.",
       inputSchema: z.object({
         limit: z.number().optional().describe("Number of results to return"),
         offset: z.number().optional().describe("Offset for pagination"),
-        category: z.string().optional().describe("Filter by activity category"),
+        category: z
+          .enum([
+            "siteActions",
+            "kinstaDns",
+            "migrations",
+            "billing",
+            "notifications",
+            "userManagement",
+            "personalSettings",
+            "samlSso",
+          ])
+          .optional()
+          .describe("Filter by activity category"),
         site_id: z.string().optional().describe("Filter by site ID"),
         id_initiated_by: z
           .string()
           .optional()
           .describe("Filter by user ID who initiated the action"),
         id_api_key: z.string().optional().describe("Filter by API key ID"),
-        language: z.string().optional().describe("Language for log messages"),
+        language: z
+          .enum(["da", "de", "en", "es", "fr", "it", "ja", "nl", "pt", "sv"])
+          .optional()
+          .describe("Language for log messages"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -122,6 +162,7 @@ export function registerCompanyTools(server: McpServer): void {
   server.registerTool(
     "kinsta.company.plugins",
     {
+      title: "List Company Plugins",
       description:
         "List all WordPress plugins across all sites in your Kinsta company. Supports search, filtering, and pagination.",
       inputSchema: z.object({
@@ -133,9 +174,20 @@ export function registerCompanyTools(server: McpServer): void {
           .optional()
           .describe("Filter by plugin status (e.g. active, inactive)"),
         column: z.string().optional().describe("Column to sort by"),
-        order_by: z.string().optional().describe("Sort order (asc or desc)"),
+        order_by: z
+          .object({
+            field: z.string().describe("Field to sort by"),
+            order: z.string().describe("Sort direction (asc or desc)"),
+          })
+          .optional()
+          .describe("Sort configuration"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -151,7 +203,7 @@ export function registerCompanyTools(server: McpServer): void {
           search: args.search,
           status: args.status,
           column: args.column,
-          order_by: args.order_by,
+          order_by: args.order_by ? JSON.stringify(args.order_by) : undefined,
         }),
       });
 
@@ -163,6 +215,7 @@ export function registerCompanyTools(server: McpServer): void {
   server.registerTool(
     "kinsta.company.themes",
     {
+      title: "List Company Themes",
       description:
         "List all WordPress themes across all sites in your Kinsta company. Supports search, filtering, and pagination.",
       inputSchema: z.object({
@@ -174,9 +227,20 @@ export function registerCompanyTools(server: McpServer): void {
           .optional()
           .describe("Filter by theme status (e.g. active, inactive)"),
         column: z.string().optional().describe("Column to sort by"),
-        order_by: z.string().optional().describe("Sort order (asc or desc)"),
+        order_by: z
+          .object({
+            field: z.string().describe("Field to sort by"),
+            order: z.string().describe("Sort direction (asc or desc)"),
+          })
+          .optional()
+          .describe("Sort configuration"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
       const clientResult = getKinstaClient(extra);
@@ -192,7 +256,7 @@ export function registerCompanyTools(server: McpServer): void {
           search: args.search,
           status: args.status,
           column: args.column,
-          order_by: args.order_by,
+          order_by: args.order_by ? JSON.stringify(args.order_by) : undefined,
         }),
       });
 
