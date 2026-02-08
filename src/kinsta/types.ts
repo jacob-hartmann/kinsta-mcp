@@ -28,7 +28,8 @@ export class KinstaClientError extends Error {
     message: string,
     public readonly code: KinstaErrorCode,
     public readonly statusCode: number | undefined,
-    public readonly retryable: boolean
+    public readonly retryable: boolean,
+    public readonly apiMessage?: string
   ) {
     super(message);
     this.name = "KinstaClientError";

@@ -19,12 +19,15 @@ export function registerPingTool(server: McpServer): void {
   server.registerTool(
     "kinsta.ping",
     {
+      title: "Ping",
       description:
         "Check that the Kinsta MCP server is running and that API credentials " +
         "are configured. Does not make any API calls to Kinsta.",
       inputSchema: z.object({}),
       annotations: {
         readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: false,
       },
     },
     (_args, _extra) => {

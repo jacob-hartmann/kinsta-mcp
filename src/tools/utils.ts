@@ -4,6 +4,8 @@
  * Common utilities for MCP tool implementations to reduce code duplication.
  */
 
+import { z } from "zod";
+
 // ---------------------------------------------------------------------------
 // Response Types
 // ---------------------------------------------------------------------------
@@ -22,6 +24,25 @@ export interface ToolErrorResponse {
 export interface ToolSuccessResponse {
   [x: string]: unknown;
   content: ToolTextContent[];
+  structuredContent?: Record<string, unknown>;
+}
+
+// ---------------------------------------------------------------------------
+// Output Schema
+// ---------------------------------------------------------------------------
+
+export const kinstaOutputSchema = z.looseObject({});
+
+// ---------------------------------------------------------------------------
+// ID Validation
+// ---------------------------------------------------------------------------
+
+const SAFE_ID_PATTERN = /^[a-zA-Z0-9_-]+$/;
+
+export function validateId(value: string, paramName: string): string | null {
+  if (!SAFE_ID_PATTERN.test(value))
+    return `Invalid ${paramName}: contains illegal characters`;
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -110,7 +131,7 @@ export function formatValidationError(message: string): ToolErrorResponse {
  * Format a successful JSON response.
  */
 export function formatSuccess(data: unknown): ToolSuccessResponse {
-  return {
+  const base: ToolSuccessResponse = {
     content: [
       {
         type: "text" as const,
@@ -118,6 +139,10 @@ export function formatSuccess(data: unknown): ToolSuccessResponse {
       },
     ],
   };
+  if (data !== null && typeof data === "object") {
+    base.structuredContent = data as Record<string, unknown>;
+  }
+  return base;
 }
 
 /**

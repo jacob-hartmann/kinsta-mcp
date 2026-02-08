@@ -43,10 +43,17 @@ async function startStdioServer(server: McpServer): Promise<void> {
  * Create an MCP server with all handlers registered
  */
 function createServer(): McpServer {
-  const server = new McpServer({
-    name: SERVER_NAME,
-    version: SERVER_VERSION,
-  });
+  const server = new McpServer(
+    { name: SERVER_NAME, version: SERVER_VERSION },
+    {
+      instructions:
+        "Kinsta MCP server for managing WordPress sites on Kinsta hosting. " +
+        "Start with kinsta.ping to verify connectivity. Use kinsta.sites.list to discover sites, " +
+        "then kinsta.environments.list to find environments. Most mutating operations return an " +
+        "operation_id — poll kinsta.operations.status to track progress. " +
+        "Environment IDs (env_id) are required for most tools.",
+    }
+  );
 
   registerTools(server);
   registerResources(server);
@@ -62,7 +69,16 @@ async function main(): Promise<void> {
   console.error(
     `[${SERVER_NAME}] Starting server v${SERVER_VERSION} (stdio transport)...`
   );
-  await startStdioServer(createServer());
+  const server = createServer();
+
+  process.on("SIGTERM", () => {
+    void server.close();
+  });
+  process.on("SIGINT", () => {
+    void server.close();
+  });
+
+  await startStdioServer(server);
 }
 
 // Run the server

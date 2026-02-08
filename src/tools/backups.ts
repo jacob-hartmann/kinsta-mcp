@@ -1,19 +1,35 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import { formatAuthError, formatError, formatSuccess } from "./utils.js";
+import {
+  formatAuthError,
+  formatError,
+  formatSuccess,
+  formatValidationError,
+  kinstaOutputSchema,
+  validateId,
+} from "./utils.js";
 
 export function registerBackupTools(server: McpServer): void {
   server.registerTool(
     "kinsta.backups.list",
     {
+      title: "List Backups",
       description: "List all backups for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
+      const envIdError = validateId(args.env_id, "env_id");
+      if (envIdError) return formatValidationError(envIdError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -30,13 +46,22 @@ export function registerBackupTools(server: McpServer): void {
   server.registerTool(
     "kinsta.backups.downloadable",
     {
+      title: "List Downloadable Backups",
       description: "List downloadable backups for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      annotations: { readOnlyHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async (args, extra) => {
+      const envIdError = validateId(args.env_id, "env_id");
+      if (envIdError) return formatValidationError(envIdError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -53,6 +78,7 @@ export function registerBackupTools(server: McpServer): void {
   server.registerTool(
     "kinsta.backups.create",
     {
+      title: "Create Backup",
       description:
         "Create a manual backup for an environment. Returns an operation_id.",
       inputSchema: z.object({
@@ -62,8 +88,13 @@ export function registerBackupTools(server: McpServer): void {
           .optional()
           .describe("Optional tag/label for the backup"),
       }),
+      outputSchema: kinstaOutputSchema,
+      annotations: { openWorldHint: true },
     },
     async (args, extra) => {
+      const envIdError = validateId(args.env_id, "env_id");
+      if (envIdError) return formatValidationError(envIdError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -84,15 +115,20 @@ export function registerBackupTools(server: McpServer): void {
   server.registerTool(
     "kinsta.backups.restore",
     {
+      title: "Restore Backup",
       description:
         "Restore an environment from a backup. This will overwrite the current environment. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID to restore to"),
         backup_id: z.string().describe("The backup ID to restore from"),
       }),
-      annotations: { destructiveHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: { destructiveHint: true, openWorldHint: true },
     },
     async (args, extra) => {
+      const envIdError = validateId(args.env_id, "env_id");
+      if (envIdError) return formatValidationError(envIdError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
@@ -110,14 +146,21 @@ export function registerBackupTools(server: McpServer): void {
   server.registerTool(
     "kinsta.backups.delete",
     {
+      title: "Delete Backup",
       description: "Delete a backup. This action cannot be undone.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
         backup_id: z.string().describe("The backup ID to delete"),
       }),
-      annotations: { destructiveHint: true },
+      outputSchema: kinstaOutputSchema,
+      annotations: { destructiveHint: true, openWorldHint: true },
     },
     async (args, extra) => {
+      const envIdError = validateId(args.env_id, "env_id");
+      if (envIdError) return formatValidationError(envIdError);
+      const backupIdError = validateId(args.backup_id, "backup_id");
+      if (backupIdError) return formatValidationError(backupIdError);
+
       const clientResult = getKinstaClient(extra);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
