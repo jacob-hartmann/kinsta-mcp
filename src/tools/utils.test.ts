@@ -6,6 +6,7 @@ import {
   formatSuccess,
   formatMessage,
   buildParams,
+  validateId,
 } from "./utils.js";
 
 describe("Tool Utilities", () => {
@@ -38,6 +39,16 @@ describe("Tool Utilities", () => {
 
       expect(result.content[0]?.text).toContain("site was not found");
     });
+
+    it("should use raw message for NOT_FOUND without resourceType", () => {
+      const result = formatError({ code: "NOT_FOUND", message: "raw msg" });
+      expect(result.content[0]?.text).toContain("raw msg");
+    });
+
+    it("should use mapped message for FORBIDDEN", () => {
+      const result = formatError({ code: "FORBIDDEN", message: "raw" });
+      expect(result.content[0]?.text).toContain("does not have permission");
+    });
   });
 
   describe("formatAuthError", () => {
@@ -64,6 +75,11 @@ describe("Tool Utilities", () => {
       const result = formatSuccess({ name: "test" });
 
       expect(result.content[0]?.text).toContain('"name": "test"');
+    });
+
+    it("should not include structuredContent for non-object data", () => {
+      const result = formatSuccess(null);
+      expect(result.structuredContent).toBeUndefined();
     });
   });
 
@@ -94,6 +110,17 @@ describe("Tool Utilities", () => {
       });
 
       expect(result).toEqual({ name: "", count: 0, active: false });
+    });
+  });
+
+  describe("validateId", () => {
+    it("should return null for valid IDs", () => {
+      expect(validateId("abc-123_XYZ", "site_id")).toBeNull();
+    });
+
+    it("should return error for invalid IDs", () => {
+      const result = validateId("../etc/passwd", "site_id");
+      expect(result).toBe("Invalid site_id: contains illegal characters");
     });
   });
 });

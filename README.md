@@ -1,9 +1,11 @@
 # Kinsta MCP Server
 
 [![CI](https://github.com/jacob-hartmann/kinsta-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/jacob-hartmann/kinsta-mcp/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/jacob-hartmann/kinsta-mcp/badge.svg?branch=main)](https://coveralls.io/github/jacob-hartmann/kinsta-mcp?branch=main)
 [![CodeQL](https://github.com/jacob-hartmann/kinsta-mcp/actions/workflows/codeql.yml/badge.svg)](https://github.com/jacob-hartmann/kinsta-mcp/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/jacob-hartmann/kinsta-mcp/badge)](https://securityscorecards.dev/viewer/?uri=github.com/jacob-hartmann/kinsta-mcp)
 [![npm version](https://img.shields.io/npm/v/kinsta-mcp)](https://www.npmjs.com/package/kinsta-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/kinsta-mcp)](https://www.npmjs.com/package/kinsta-mcp)
 [![License](https://img.shields.io/github/license/jacob-hartmann/kinsta-mcp)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 

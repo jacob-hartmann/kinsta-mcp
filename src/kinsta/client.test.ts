@@ -184,5 +184,125 @@ describe("KinstaClient", () => {
         })
       );
     });
+
+    it("should handle non-JSON response body on success", async () => {
+      vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+        new Response("not json", {
+          status: 200,
+          headers: { "Content-Type": "text/plain" },
+        })
+      );
+
+      const result = await client.request({ path: "/sites" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("UNKNOWN");
+        expect(result.error.message).toContain("non-JSON");
+      }
+    });
+
+    it("should extract apiMessage from error JSON body", async () => {
+      vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: "Site not found" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        })
+      );
+
+      const result = await client.request({ path: "/sites/unknown" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("NOT_FOUND");
+        expect(result.error.apiMessage).toBe("Site not found");
+        expect(result.error.message).toContain("Site not found");
+      }
+    });
+
+    it("should extract apiMessage from 'error' key when 'message' is absent", async () => {
+      vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: "Something went wrong" }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        })
+      );
+
+      const result = await client.request({ path: "/sites" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("SERVER_ERROR");
+        expect(result.error.apiMessage).toBe("Something went wrong");
+        expect(result.error.message).toContain("Something went wrong");
+      }
+    });
+
+    it("should handle 4xx as VALIDATION_ERROR", async () => {
+      vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+        new Response("Unprocessable", { status: 422 })
+      );
+
+      const result = await client.request({ path: "/sites" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("VALIDATION_ERROR");
+        expect(result.error.statusCode).toBe(422);
+        expect(result.error.retryable).toBe(false);
+      }
+    });
+
+    it("should handle AbortError as TIMEOUT", async () => {
+      const abortError = new Error("The operation was aborted");
+      abortError.name = "AbortError";
+      vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(abortError);
+
+      const result = await client.request({ path: "/sites" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("TIMEOUT");
+        expect(result.error.retryable).toBe(true);
+      }
+    });
+
+    it("should abort fetch when timeout fires", async () => {
+      vi.useFakeTimers();
+      // Mock fetch to hang until abort signal fires
+      vi.spyOn(globalThis, "fetch").mockImplementationOnce(
+        (_url, init) =>
+          new Promise((_resolve, reject) => {
+            (init as RequestInit).signal?.addEventListener("abort", () => {
+              const err = new Error("The operation was aborted");
+              err.name = "AbortError";
+              reject(err);
+            });
+          })
+      );
+
+      const resultPromise = client.request({ path: "/sites" });
+      // Advance past the 30s timeout
+      await vi.advanceTimersByTimeAsync(30_001);
+      const result = await resultPromise;
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("TIMEOUT");
+      }
+      vi.useRealTimers();
+    });
+
+    it("should handle non-Error throw", async () => {
+      vi.spyOn(globalThis, "fetch").mockRejectedValueOnce("string error");
+
+      const result = await client.request({ path: "/sites" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("UNKNOWN");
+        expect(result.error.message).toBe("Unknown error occurred");
+      }
+    });
   });
 });
