@@ -1,11 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import {
-  formatAuthError,
-  formatError,
-  formatSuccess,
-} from "./utils.js";
+import { formatAuthError, formatError, formatSuccess } from "./utils.js";
 
 export function registerDomainTools(server: McpServer): void {
   server.registerTool(
@@ -37,7 +33,9 @@ export function registerDomainTools(server: McpServer): void {
       description: "Add a custom domain to an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        domain_name: z.string().describe("The domain name to add (e.g. example.com)"),
+        domain_name: z
+          .string()
+          .describe("The domain name to add (e.g. example.com)"),
       }),
     },
     async (args, extra) => {
@@ -61,7 +59,9 @@ export function registerDomainTools(server: McpServer): void {
       description: "Remove custom domains from an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        domain_ids: z.array(z.string()).describe("Array of domain IDs to remove"),
+        domain_ids: z
+          .array(z.string())
+          .describe("Array of domain IDs to remove"),
       }),
       annotations: { destructiveHint: true },
     },
@@ -85,7 +85,9 @@ export function registerDomainTools(server: McpServer): void {
     {
       description: "Get DNS verification records for a domain.",
       inputSchema: z.object({
-        domain_id: z.string().describe("The domain ID to get verification records for"),
+        domain_id: z
+          .string()
+          .describe("The domain ID to get verification records for"),
       }),
       annotations: { readOnlyHint: true },
     },

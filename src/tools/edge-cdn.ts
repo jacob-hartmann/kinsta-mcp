@@ -1,17 +1,14 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import {
-  formatAuthError,
-  formatError,
-  formatSuccess,
-} from "./utils.js";
+import { formatAuthError, formatError, formatSuccess } from "./utils.js";
 
 export function registerEdgeCdnTools(server: McpServer): void {
   server.registerTool(
     "kinsta.edge-cache.clear",
     {
-      description: "Clear the edge cache for an environment. Returns an operation_id.",
+      description:
+        "Clear the edge cache for an environment. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
@@ -36,7 +33,9 @@ export function registerEdgeCdnTools(server: McpServer): void {
       description: "Enable or disable edge caching for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        is_enabled: z.boolean().describe("Whether to enable (true) or disable (false) edge caching"),
+        is_enabled: z
+          .boolean()
+          .describe("Whether to enable (true) or disable (false) edge caching"),
       }),
     },
     async (args, extra) => {
@@ -57,7 +56,8 @@ export function registerEdgeCdnTools(server: McpServer): void {
   server.registerTool(
     "kinsta.cdn.clear-cache",
     {
-      description: "Clear the CDN cache for an environment. Returns an operation_id.",
+      description:
+        "Clear the CDN cache for an environment. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
@@ -79,11 +79,17 @@ export function registerEdgeCdnTools(server: McpServer): void {
   server.registerTool(
     "kinsta.cdn.image-optimization",
     {
-      description: "Configure CDN image optimization settings for an environment.",
+      description:
+        "Configure CDN image optimization settings for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        is_enabled: z.boolean().describe("Whether to enable image optimization"),
-        is_lossless: z.boolean().optional().describe("Use lossless compression (true) or lossy (false)"),
+        is_enabled: z
+          .boolean()
+          .describe("Whether to enable image optimization"),
+        is_lossless: z
+          .boolean()
+          .optional()
+          .describe("Use lossless compression (true) or lossy (false)"),
       }),
     },
     async (args, extra) => {
@@ -93,7 +99,8 @@ export function registerEdgeCdnTools(server: McpServer): void {
       const body: Record<string, unknown> = {
         is_enabled: args.is_enabled,
       };
-      if (args.is_lossless !== undefined) body["is_lossless"] = args.is_lossless;
+      if (args.is_lossless !== undefined)
+        body["is_lossless"] = args.is_lossless;
 
       const result = await clientResult.client.request<unknown>({
         path: `/sites/environments/${args.env_id}/cdn/image-optimization`,

@@ -1,11 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import {
-  formatAuthError,
-  formatError,
-  formatSuccess,
-} from "./utils.js";
+import { formatAuthError, formatError, formatSuccess } from "./utils.js";
 
 export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
@@ -14,7 +10,9 @@ export function registerSiteOperationTools(server: McpServer): void {
       description:
         "Clear the server cache for an environment. Returns an operation_id.",
       inputSchema: z.object({
-        environment_id: z.string().describe("The environment ID to clear cache for"),
+        environment_id: z
+          .string()
+          .describe("The environment ID to clear cache for"),
       }),
     },
     async (args, extra) => {
@@ -35,10 +33,11 @@ export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
     "kinsta.tools.restart-php",
     {
-      description:
-        "Restart PHP for an environment. Returns an operation_id.",
+      description: "Restart PHP for an environment. Returns an operation_id.",
       inputSchema: z.object({
-        environment_id: z.string().describe("The environment ID to restart PHP for"),
+        environment_id: z
+          .string()
+          .describe("The environment ID to restart PHP for"),
       }),
     },
     async (args, extra) => {
@@ -63,7 +62,9 @@ export function registerSiteOperationTools(server: McpServer): void {
         "Change the PHP version for an environment. Returns an operation_id.",
       inputSchema: z.object({
         environment_id: z.string().describe("The environment ID"),
-        php_version: z.string().describe("PHP version to switch to (e.g. 8.1, 8.2, 8.3)"),
+        php_version: z
+          .string()
+          .describe("PHP version to switch to (e.g. 8.1, 8.2, 8.3)"),
         is_opt_out_from_automatic_php_update: z
           .boolean()
           .optional()
@@ -96,7 +97,8 @@ export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
     "kinsta.tools.denied-ips",
     {
-      description: "Get the list of denied (blocked) IP addresses for an environment.",
+      description:
+        "Get the list of denied (blocked) IP addresses for an environment.",
       inputSchema: z.object({
         environment_id: z.string().describe("The environment ID"),
       }),
@@ -120,7 +122,8 @@ export function registerSiteOperationTools(server: McpServer): void {
   server.registerTool(
     "kinsta.tools.denied-ips.update",
     {
-      description: "Update the list of denied (blocked) IP addresses for an environment.",
+      description:
+        "Update the list of denied (blocked) IP addresses for an environment.",
       inputSchema: z.object({
         environment_id: z.string().describe("The environment ID"),
         ip_list: z.array(z.string()).describe("List of IP addresses to block"),

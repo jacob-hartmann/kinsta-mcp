@@ -12,7 +12,9 @@ export function registerOperationTools(server: McpServer): void {
         "Many Kinsta actions (site creation, backups, cache clearing, etc.) return an operation_id " +
         "that can be polled here to track progress.",
       inputSchema: z.object({
-        operation_id: z.string().describe("The operation ID to check status for"),
+        operation_id: z
+          .string()
+          .describe("The operation ID to check status for"),
       }),
       annotations: {
         readOnlyHint: true,

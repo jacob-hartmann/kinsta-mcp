@@ -1,11 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import {
-  formatAuthError,
-  formatError,
-  formatSuccess,
-} from "./utils.js";
+import { formatAuthError, formatError, formatSuccess } from "./utils.js";
 
 export function registerPluginThemeTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
@@ -66,7 +62,9 @@ export function registerPluginThemeTools(server: McpServer): void {
         "Update multiple plugins to their latest versions at once. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        plugin_ids: z.array(z.string()).describe("Array of plugin IDs to update"),
+        plugin_ids: z
+          .array(z.string())
+          .describe("Array of plugin IDs to update"),
       }),
     },
     async (args, extra) => {

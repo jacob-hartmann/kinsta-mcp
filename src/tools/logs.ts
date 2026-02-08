@@ -20,10 +20,7 @@ export function registerLogTools(server: McpServer): void {
           .string()
           .optional()
           .describe("Log file name (e.g. error.log, access.log)"),
-        lines: z
-          .number()
-          .optional()
-          .describe("Number of log lines to return"),
+        lines: z.number().optional().describe("Number of log lines to return"),
       }),
       annotations: { readOnlyHint: true },
     },

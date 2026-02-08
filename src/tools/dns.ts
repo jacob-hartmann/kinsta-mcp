@@ -1,11 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import {
-  formatAuthError,
-  formatError,
-  formatSuccess,
-} from "./utils.js";
+import { formatAuthError, formatError, formatSuccess } from "./utils.js";
 
 export function registerDnsTools(server: McpServer): void {
   server.registerTool(
@@ -60,9 +56,14 @@ export function registerDnsTools(server: McpServer): void {
       description: "Create a new DNS record for a domain.",
       inputSchema: z.object({
         domain_id: z.string().describe("The domain ID to create a record for"),
-        type: z.string().describe("DNS record type (e.g. A, AAAA, CNAME, MX, TXT, SRV)"),
+        type: z
+          .string()
+          .describe("DNS record type (e.g. A, AAAA, CNAME, MX, TXT, SRV)"),
         name: z.string().describe("DNS record name (e.g. @ or subdomain)"),
-        ttl: z.number().min(300).describe("Time to live in seconds (minimum 300)"),
+        ttl: z
+          .number()
+          .min(300)
+          .describe("Time to live in seconds (minimum 300)"),
         resource_records: z
           .array(z.object({ value: z.string().describe("Record value") }))
           .describe("Array of resource record values"),
@@ -94,9 +95,15 @@ export function registerDnsTools(server: McpServer): void {
       description: "Update an existing DNS record for a domain.",
       inputSchema: z.object({
         domain_id: z.string().describe("The domain ID containing the record"),
-        type: z.string().describe("DNS record type (e.g. A, AAAA, CNAME, MX, TXT, SRV)"),
+        type: z
+          .string()
+          .describe("DNS record type (e.g. A, AAAA, CNAME, MX, TXT, SRV)"),
         name: z.string().describe("DNS record name to update"),
-        ttl: z.number().min(300).optional().describe("New TTL in seconds (minimum 300)"),
+        ttl: z
+          .number()
+          .min(300)
+          .optional()
+          .describe("New TTL in seconds (minimum 300)"),
         new_resource_records: z
           .array(z.object({ value: z.string().describe("Record value") }))
           .optional()

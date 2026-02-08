@@ -1,11 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import {
-  formatAuthError,
-  formatError,
-  formatSuccess,
-} from "./utils.js";
+import { formatAuthError, formatError, formatSuccess } from "./utils.js";
 
 export function registerBackupTools(server: McpServer): void {
   server.registerTool(
@@ -61,7 +57,10 @@ export function registerBackupTools(server: McpServer): void {
         "Create a manual backup for an environment. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        tag: z.string().optional().describe("Optional tag/label for the backup"),
+        tag: z
+          .string()
+          .optional()
+          .describe("Optional tag/label for the backup"),
       }),
     },
     async (args, extra) => {

@@ -17,7 +17,10 @@ export function registerPrompts(server: McpServer): void {
       description: "Guide through creating a new WordPress site on Kinsta",
       argsSchema: {
         site_name: z.string().describe("Name for the new site"),
-        region: z.string().optional().describe("Deployment region (optional, will suggest if omitted)"),
+        region: z
+          .string()
+          .optional()
+          .describe("Deployment region (optional, will suggest if omitted)"),
       },
     },
     (args) => ({
@@ -75,7 +78,8 @@ export function registerPrompts(server: McpServer): void {
   server.registerPrompt(
     "push-environment",
     {
-      description: "Guide for pushing changes between environments (e.g. staging to live)",
+      description:
+        "Guide for pushing changes between environments (e.g. staging to live)",
       argsSchema: {
         site_id: z.string().describe("The site ID containing the environments"),
       },

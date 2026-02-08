@@ -26,7 +26,9 @@ export function registerResources(server: McpServer): void {
       });
 
       if (!result.success) {
-        throw new Error(`Kinsta API Error (${result.error.code}): ${result.error.message}`);
+        throw new Error(
+          `Kinsta API Error (${result.error.code}): ${result.error.message}`
+        );
       }
 
       return {
@@ -54,7 +56,9 @@ export function registerResources(server: McpServer): void {
       });
 
       if (!result.success) {
-        throw new Error(`Kinsta API Error (${result.error.code}): ${result.error.message}`);
+        throw new Error(
+          `Kinsta API Error (${result.error.code}): ${result.error.message}`
+        );
       }
 
       return {
@@ -71,7 +75,9 @@ export function registerResources(server: McpServer): void {
 
   server.registerResource(
     "site-environments",
-    new ResourceTemplate("kinsta://sites/{site_id}/environments", { list: undefined }),
+    new ResourceTemplate("kinsta://sites/{site_id}/environments", {
+      list: undefined,
+    }),
     { description: "List environments for a Kinsta site" },
     async (_uri, variables, extra) => {
       const client = getKinstaClientOrThrow(extra);
@@ -82,7 +88,9 @@ export function registerResources(server: McpServer): void {
       });
 
       if (!result.success) {
-        throw new Error(`Kinsta API Error (${result.error.code}): ${result.error.message}`);
+        throw new Error(
+          `Kinsta API Error (${result.error.code}): ${result.error.message}`
+        );
       }
 
       return {
@@ -110,7 +118,9 @@ export function registerResources(server: McpServer): void {
       });
 
       if (!result.success) {
-        throw new Error(`Kinsta API Error (${result.error.code}): ${result.error.message}`);
+        throw new Error(
+          `Kinsta API Error (${result.error.code}): ${result.error.message}`
+        );
       }
 
       return {

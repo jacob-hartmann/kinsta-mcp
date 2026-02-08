@@ -1,11 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
-import {
-  formatAuthError,
-  formatError,
-  formatSuccess,
-} from "./utils.js";
+import { formatAuthError, formatError, formatSuccess } from "./utils.js";
 
 export function registerSftpUserTools(server: McpServer): void {
   server.registerTool(
@@ -34,10 +30,15 @@ export function registerSftpUserTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sftp-users.toggle",
     {
-      description: "Enable or disable additional SFTP/SSH accounts for an environment.",
+      description:
+        "Enable or disable additional SFTP/SSH accounts for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        is_enabled: z.boolean().describe("Whether to enable (true) or disable (false) additional accounts"),
+        is_enabled: z
+          .boolean()
+          .describe(
+            "Whether to enable (true) or disable (false) additional accounts"
+          ),
       }),
     },
     async (args, extra) => {
@@ -58,7 +59,8 @@ export function registerSftpUserTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sftp-users.add",
     {
-      description: "Add a new additional SFTP/SSH user account to an environment.",
+      description:
+        "Add a new additional SFTP/SSH user account to an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
         username: z.string().describe("Username for the new SFTP account"),
@@ -86,7 +88,8 @@ export function registerSftpUserTools(server: McpServer): void {
   server.registerTool(
     "kinsta.sftp-users.remove",
     {
-      description: "Remove an additional SFTP/SSH user account from an environment.",
+      description:
+        "Remove an additional SFTP/SSH user account from an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
         account_id: z.string().describe("The SFTP account ID to remove"),

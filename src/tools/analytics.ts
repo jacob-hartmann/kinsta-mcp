@@ -10,8 +10,14 @@ import {
 
 const analyticsInputSchema = z.object({
   env_id: z.string().describe("The environment ID"),
-  timeframe_start: z.string().optional().describe("Start date for the analytics period (ISO 8601 format)"),
-  timeframe_end: z.string().optional().describe("End date for the analytics period (ISO 8601 format)"),
+  timeframe_start: z
+    .string()
+    .optional()
+    .describe("Start date for the analytics period (ISO 8601 format)"),
+  timeframe_end: z
+    .string()
+    .optional()
+    .describe("End date for the analytics period (ISO 8601 format)"),
 });
 
 function registerAnalyticsTool(

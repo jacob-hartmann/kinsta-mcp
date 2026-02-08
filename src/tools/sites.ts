@@ -71,14 +71,26 @@ export function registerSiteTools(server: McpServer): void {
         "Create a new WordPress site on Kinsta. Returns an operation_id to track progress.",
       inputSchema: z.object({
         display_name: z.string().describe("Display name for the new site"),
-        region: z.string().describe("Deployment region (use kinsta.company.regions to list available regions)"),
+        region: z
+          .string()
+          .describe(
+            "Deployment region (use kinsta.company.regions to list available regions)"
+          ),
         admin_email: z.string().describe("WordPress admin email"),
         admin_password: z.string().describe("WordPress admin password"),
         admin_user: z.string().describe("WordPress admin username"),
         site_title: z.string().describe("WordPress site title"),
-        wp_language: z.string().describe("WordPress language code (e.g. en_US)"),
-        is_multisite: z.boolean().optional().describe("Create as WordPress multisite"),
-        is_subdomain_multisite: z.boolean().optional().describe("Use subdomain-based multisite"),
+        wp_language: z
+          .string()
+          .describe("WordPress language code (e.g. en_US)"),
+        is_multisite: z
+          .boolean()
+          .optional()
+          .describe("Create as WordPress multisite"),
+        is_subdomain_multisite: z
+          .boolean()
+          .optional()
+          .describe("Use subdomain-based multisite"),
         woocommerce: z.boolean().optional().describe("Install WooCommerce"),
         wordpressseo: z.boolean().optional().describe("Install Yoast SEO"),
       }),
@@ -98,11 +110,14 @@ export function registerSiteTools(server: McpServer): void {
         site_title: args.site_title,
         wp_language: args.wp_language,
       };
-      if (args.is_multisite !== undefined) body["is_multisite"] = args.is_multisite;
+      if (args.is_multisite !== undefined)
+        body["is_multisite"] = args.is_multisite;
       if (args.is_subdomain_multisite !== undefined)
         body["is_subdomain_multisite"] = args.is_subdomain_multisite;
-      if (args.woocommerce !== undefined) body["woocommerce"] = args.woocommerce;
-      if (args.wordpressseo !== undefined) body["wordpressseo"] = args.wordpressseo;
+      if (args.woocommerce !== undefined)
+        body["woocommerce"] = args.woocommerce;
+      if (args.wordpressseo !== undefined)
+        body["wordpressseo"] = args.wordpressseo;
 
       const result = await clientResult.client.request<unknown>({
         path: "/sites",
@@ -152,7 +167,9 @@ export function registerSiteTools(server: McpServer): void {
         "Clone an existing site to create a new site. Returns an operation_id.",
       inputSchema: z.object({
         display_name: z.string().describe("Display name for the cloned site"),
-        source_env_id: z.string().describe("Source environment ID to clone from"),
+        source_env_id: z
+          .string()
+          .describe("Source environment ID to clone from"),
       }),
     },
     async (args, extra) => {
@@ -206,7 +223,9 @@ export function registerSiteTools(server: McpServer): void {
         "Reset a Kinsta site to a fresh WordPress install. This removes all existing data.",
       inputSchema: z.object({
         site_id: z.string().describe("The site ID to reset"),
-        admin_password: z.string().describe("New WordPress admin password after reset"),
+        admin_password: z
+          .string()
+          .describe("New WordPress admin password after reset"),
       }),
       annotations: { destructiveHint: true },
     },

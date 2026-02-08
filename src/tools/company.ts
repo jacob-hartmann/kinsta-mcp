@@ -34,7 +34,8 @@ export function registerCompanyTools(server: McpServer): void {
   server.registerTool(
     "kinsta.company.regions",
     {
-      description: "List all available deployment regions for your Kinsta company.",
+      description:
+        "List all available deployment regions for your Kinsta company.",
       inputSchema: z.object({}),
       annotations: { readOnlyHint: true },
     },
@@ -85,7 +86,10 @@ export function registerCompanyTools(server: McpServer): void {
         offset: z.number().optional().describe("Offset for pagination"),
         category: z.string().optional().describe("Filter by activity category"),
         site_id: z.string().optional().describe("Filter by site ID"),
-        id_initiated_by: z.string().optional().describe("Filter by user ID who initiated the action"),
+        id_initiated_by: z
+          .string()
+          .optional()
+          .describe("Filter by user ID who initiated the action"),
         id_api_key: z.string().optional().describe("Filter by API key ID"),
         language: z.string().optional().describe("Language for log messages"),
       }),
@@ -124,7 +128,10 @@ export function registerCompanyTools(server: McpServer): void {
         offset: z.number().optional().describe("Offset for pagination"),
         limit: z.number().optional().describe("Number of results to return"),
         search: z.string().optional().describe("Search term to filter plugins"),
-        status: z.string().optional().describe("Filter by plugin status (e.g. active, inactive)"),
+        status: z
+          .string()
+          .optional()
+          .describe("Filter by plugin status (e.g. active, inactive)"),
         column: z.string().optional().describe("Column to sort by"),
         order_by: z.string().optional().describe("Sort order (asc or desc)"),
       }),
@@ -162,7 +169,10 @@ export function registerCompanyTools(server: McpServer): void {
         offset: z.number().optional().describe("Offset for pagination"),
         limit: z.number().optional().describe("Number of results to return"),
         search: z.string().optional().describe("Search term to filter themes"),
-        status: z.string().optional().describe("Filter by theme status (e.g. active, inactive)"),
+        status: z
+          .string()
+          .optional()
+          .describe("Filter by theme status (e.g. active, inactive)"),
         column: z.string().optional().describe("Column to sort by"),
         order_by: z.string().optional().describe("Sort order (asc or desc)"),
       }),

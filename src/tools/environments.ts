@@ -42,18 +42,30 @@ export function registerEnvironmentTools(server: McpServer): void {
       description:
         "Create a new WordPress environment for a site. Returns an operation_id.",
       inputSchema: z.object({
-        site_id: z.string().describe("The site ID to create the environment for"),
+        site_id: z
+          .string()
+          .describe("The site ID to create the environment for"),
         display_name: z.string().describe("Display name for the environment"),
         site_title: z.string().describe("WordPress site title"),
-        is_premium: z.boolean().describe("Whether this is a premium staging environment"),
+        is_premium: z
+          .boolean()
+          .describe("Whether this is a premium staging environment"),
         admin_email: z.string().describe("WordPress admin email"),
         admin_password: z.string().describe("WordPress admin password"),
         admin_user: z.string().describe("WordPress admin username"),
-        wp_language: z.string().describe("WordPress language code (e.g. en_US)"),
+        wp_language: z
+          .string()
+          .describe("WordPress language code (e.g. en_US)"),
         is_multisite: z.boolean().optional().describe("Create as multisite"),
-        is_subdomain_multisite: z.boolean().optional().describe("Use subdomain-based multisite"),
+        is_subdomain_multisite: z
+          .boolean()
+          .optional()
+          .describe("Use subdomain-based multisite"),
         woocommerce: z.boolean().optional().describe("Install WooCommerce"),
-        wordpress_plugin_edd: z.boolean().optional().describe("Install Easy Digital Downloads"),
+        wordpress_plugin_edd: z
+          .boolean()
+          .optional()
+          .describe("Install Easy Digital Downloads"),
         wordpressseo: z.boolean().optional().describe("Install Yoast SEO"),
       }),
     },
@@ -70,13 +82,16 @@ export function registerEnvironmentTools(server: McpServer): void {
         admin_user: args.admin_user,
         wp_language: args.wp_language,
       };
-      if (args.is_multisite !== undefined) body["is_multisite"] = args.is_multisite;
+      if (args.is_multisite !== undefined)
+        body["is_multisite"] = args.is_multisite;
       if (args.is_subdomain_multisite !== undefined)
         body["is_subdomain_multisite"] = args.is_subdomain_multisite;
-      if (args.woocommerce !== undefined) body["woocommerce"] = args.woocommerce;
+      if (args.woocommerce !== undefined)
+        body["woocommerce"] = args.woocommerce;
       if (args.wordpress_plugin_edd !== undefined)
         body["wordpress_plugin_edd"] = args.wordpress_plugin_edd;
-      if (args.wordpressseo !== undefined) body["wordpressseo"] = args.wordpressseo;
+      if (args.wordpressseo !== undefined)
+        body["wordpressseo"] = args.wordpressseo;
 
       const result = await clientResult.client.request<unknown>({
         path: `/sites/${args.site_id}/environments`,
@@ -95,9 +110,13 @@ export function registerEnvironmentTools(server: McpServer): void {
       description:
         "Create a new plain (empty) environment for a site. Returns an operation_id.",
       inputSchema: z.object({
-        site_id: z.string().describe("The site ID to create the environment for"),
+        site_id: z
+          .string()
+          .describe("The site ID to create the environment for"),
         display_name: z.string().describe("Display name for the environment"),
-        is_premium: z.boolean().describe("Whether this is a premium staging environment"),
+        is_premium: z
+          .boolean()
+          .describe("Whether this is a premium staging environment"),
       }),
     },
     async (args, extra) => {
@@ -124,10 +143,18 @@ export function registerEnvironmentTools(server: McpServer): void {
       description:
         "Clone an existing environment to create a new one. Returns an operation_id.",
       inputSchema: z.object({
-        site_id: z.string().describe("The site ID to create the environment for"),
-        display_name: z.string().describe("Display name for the cloned environment"),
-        is_premium: z.boolean().describe("Whether this is a premium staging environment"),
-        source_env_id: z.string().describe("Source environment ID to clone from"),
+        site_id: z
+          .string()
+          .describe("The site ID to create the environment for"),
+        display_name: z
+          .string()
+          .describe("Display name for the cloned environment"),
+        is_premium: z
+          .boolean()
+          .describe("Whether this is a premium staging environment"),
+        source_env_id: z
+          .string()
+          .describe("Source environment ID to clone from"),
       }),
     },
     async (args, extra) => {
@@ -156,11 +183,16 @@ export function registerEnvironmentTools(server: McpServer): void {
         "Push one environment to another (e.g. staging to live). Returns an operation_id.",
       inputSchema: z.object({
         site_id: z.string().describe("The site ID"),
-        source_env_id: z.string().describe("Source environment ID to push from"),
+        source_env_id: z
+          .string()
+          .describe("Source environment ID to push from"),
         target_env_id: z.string().describe("Target environment ID to push to"),
         push_db: z.boolean().optional().describe("Push the database"),
         push_files: z.boolean().optional().describe("Push files"),
-        run_search_and_replace: z.boolean().optional().describe("Run search and replace on the database"),
+        run_search_and_replace: z
+          .boolean()
+          .optional()
+          .describe("Run search and replace on the database"),
         push_files_option: z
           .enum(["ALL_FILES", "SPECIFIC_FILES"])
           .optional()
@@ -168,7 +200,9 @@ export function registerEnvironmentTools(server: McpServer): void {
         file_list: z
           .array(z.string())
           .optional()
-          .describe("List of specific files to push (when push_files_option is SPECIFIC_FILES)"),
+          .describe(
+            "List of specific files to push (when push_files_option is SPECIFIC_FILES)"
+          ),
       }),
     },
     async (args, extra) => {
@@ -233,7 +267,9 @@ export function registerEnvironmentTools(server: McpServer): void {
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
         thread_count: z.number().describe("Number of PHP worker threads"),
-        thread_memory: z.number().describe("Memory per PHP worker thread in MB"),
+        thread_memory: z
+          .number()
+          .describe("Memory per PHP worker thread in MB"),
       }),
     },
     async (args, extra) => {
@@ -262,7 +298,9 @@ export function registerEnvironmentTools(server: McpServer): void {
       inputSchema: z.object({
         site_id: z.string().describe("The site ID"),
         thread_count: z.number().describe("Number of PHP worker threads"),
-        thread_memory: z.number().describe("Memory per PHP worker thread in MB"),
+        thread_memory: z
+          .number()
+          .describe("Memory per PHP worker thread in MB"),
       }),
     },
     async (args, extra) => {
@@ -291,8 +329,14 @@ export function registerEnvironmentTools(server: McpServer): void {
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
         web_root_subfolder: z.string().describe("New webroot subfolder path"),
-        clear_all_cache: z.boolean().optional().describe("Clear all caches after change"),
-        refresh_plugins_and_themes: z.boolean().optional().describe("Refresh plugins and themes after change"),
+        clear_all_cache: z
+          .boolean()
+          .optional()
+          .describe("Clear all caches after change"),
+        refresh_plugins_and_themes: z
+          .boolean()
+          .optional()
+          .describe("Refresh plugins and themes after change"),
       }),
     },
     async (args, extra) => {
@@ -348,15 +392,22 @@ export function registerEnvironmentTools(server: McpServer): void {
   server.registerTool(
     "kinsta.environments.redirects",
     {
-      description: "List redirect rules for an environment. Supports filtering and pagination.",
+      description:
+        "List redirect rules for an environment. Supports filtering and pagination.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
         limit: z.number().optional().describe("Number of results to return"),
         offset: z.number().optional().describe("Offset for pagination"),
         key: z.string().optional().describe("Sort key"),
         order: z.string().optional().describe("Sort order (asc or desc)"),
-        search_query: z.string().optional().describe("Search term to filter redirects"),
-        regex_search: z.boolean().optional().describe("Whether to use regex for search"),
+        search_query: z
+          .string()
+          .optional()
+          .describe("Search term to filter redirects"),
+        regex_search: z
+          .boolean()
+          .optional()
+          .describe("Whether to use regex for search"),
       }),
       annotations: { readOnlyHint: true },
     },
@@ -396,7 +447,10 @@ export function registerEnvironmentTools(server: McpServer): void {
           .array(z.record(z.string(), z.unknown()))
           .optional()
           .describe("Rules to update or delete"),
-        new_value: z.record(z.string(), z.unknown()).optional().describe("New redirect rule to create"),
+        new_value: z
+          .record(z.string(), z.unknown())
+          .optional()
+          .describe("New redirect rule to create"),
       }),
     },
     async (args, extra) => {
@@ -454,7 +508,9 @@ export function registerEnvironmentTools(server: McpServer): void {
       description: "Enable or disable SSH/SFTP access for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        is_enabled: z.boolean().describe("Whether to enable (true) or disable (false) SSH"),
+        is_enabled: z
+          .boolean()
+          .describe("Whether to enable (true) or disable (false) SSH"),
       }),
     },
     async (args, extra) => {
@@ -475,10 +531,15 @@ export function registerEnvironmentTools(server: McpServer): void {
   server.registerTool(
     "kinsta.environments.ssh.password-access",
     {
-      description: "Enable or disable SSH password-based access for an environment.",
+      description:
+        "Enable or disable SSH password-based access for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        is_enabled: z.boolean().describe("Whether to enable (true) or disable (false) password access"),
+        is_enabled: z
+          .boolean()
+          .describe(
+            "Whether to enable (true) or disable (false) password access"
+          ),
       }),
     },
     async (args, extra) => {
@@ -570,7 +631,9 @@ export function registerEnvironmentTools(server: McpServer): void {
       description: "Update the SSH IP allowlist for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        ip_allowlist: z.array(z.string()).describe("List of IP addresses to allow SSH access"),
+        ip_allowlist: z
+          .array(z.string())
+          .describe("List of IP addresses to allow SSH access"),
       }),
     },
     async (args, extra) => {
@@ -615,10 +678,13 @@ export function registerEnvironmentTools(server: McpServer): void {
   server.registerTool(
     "kinsta.environments.ssh.password-expiration",
     {
-      description: "Change the SSH password expiration interval for an environment.",
+      description:
+        "Change the SSH password expiration interval for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        exp_interval: z.number().describe("Password expiration interval in seconds"),
+        exp_interval: z
+          .number()
+          .describe("Password expiration interval in seconds"),
       }),
     },
     async (args, extra) => {
@@ -647,7 +713,9 @@ export function registerEnvironmentTools(server: McpServer): void {
         "Run a WP-CLI command on an environment. The command must start with 'wp '.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        wp_command: z.string().describe("WP-CLI command to run (must start with 'wp ')"),
+        wp_command: z
+          .string()
+          .describe("WP-CLI command to run (must start with 'wp ')"),
       }),
     },
     async (args, extra) => {
