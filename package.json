@@ -56,17 +56,17 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.2",
-    "@modelcontextprotocol/inspector": "0.19.0",
-    "@types/node": "25.2.2",
+    "@eslint/js": "10.0.1",
+    "@modelcontextprotocol/inspector": "0.20.0",
+    "@types/node": "25.2.3",
     "@vitest/coverage-v8": "4.0.18",
-    "eslint": "9.39.2",
+    "eslint": "10.0.0",
     "eslint-config-prettier": "10.1.8",
     "prettier": "3.8.1",
     "tsup": "8.5.1",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.54.0",
+    "typescript-eslint": "8.55.0",
     "vitest": "4.0.18"
   }
 }
