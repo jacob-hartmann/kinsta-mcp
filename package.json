@@ -1,6 +1,6 @@
 {
   "name": "kinsta-mcp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Model Context Protocol (MCP) server for Kinsta WordPress hosting",
   "type": "module",
   "main": "./dist/index.js",
@@ -68,10 +68,5 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.0",
     "vitest": "4.0.18"
-  },
-  "pnpm": {
-    "overrides": {
-      "minimatch": ">=10.2.1"
-    }
   }
 }
