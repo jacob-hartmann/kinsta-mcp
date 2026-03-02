@@ -57,16 +57,16 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@modelcontextprotocol/inspector": "0.20.0",
-    "@types/node": "25.3.0",
+    "@modelcontextprotocol/inspector": "0.21.1",
+    "@types/node": "25.3.3",
     "@vitest/coverage-v8": "4.0.18",
-    "eslint": "10.0.1",
+    "eslint": "10.0.2",
     "eslint-config-prettier": "10.1.8",
     "prettier": "3.8.1",
     "tsup": "8.5.1",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.56.0",
+    "typescript-eslint": "8.56.1",
     "vitest": "4.0.18"
   }
 }
