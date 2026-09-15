@@ -1,23 +1,22 @@
 /**
- * kinsta.ping Tool
+ * kinsta_ping Tool
  *
  * A lightweight smoke test tool that confirms the MCP server is running
  * and that Kinsta API credentials are configured.
  *
  * This tool does NOT make any API calls to Kinsta.
  */
-
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { isKinstaConfigured } from "../kinsta/auth.js";
 import { formatMessage } from "./utils.js";
 
 /**
- * Register the kinsta.ping tool
+ * Register the kinsta_ping tool
  */
 export function registerPingTool(server: McpServer): void {
   server.registerTool(
-    "kinsta.ping",
+    "kinsta_ping",
     {
       title: "Ping",
       description:

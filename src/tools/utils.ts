@@ -4,8 +4,6 @@
  * Common utilities for MCP tool implementations to reduce code duplication.
  */
 
-import { z } from "zod";
-
 // ---------------------------------------------------------------------------
 // Response Types
 // ---------------------------------------------------------------------------
@@ -26,12 +24,6 @@ export interface ToolSuccessResponse {
   content: ToolTextContent[];
   structuredContent?: Record<string, unknown>;
 }
-
-// ---------------------------------------------------------------------------
-// Output Schema
-// ---------------------------------------------------------------------------
-
-export const kinstaOutputSchema = z.looseObject({});
 
 // ---------------------------------------------------------------------------
 // ID Validation

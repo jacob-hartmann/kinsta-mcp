@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
 import {
@@ -6,7 +6,7 @@ import {
   formatError,
   formatSuccess,
   formatValidationError,
-  kinstaOutputSchema,
+  buildParams,
   validateId,
 } from "./utils.js";
 
@@ -14,27 +14,24 @@ export function registerPluginThemeTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
   // Plugins
   // ---------------------------------------------------------------------------
-
   server.registerTool(
-    "kinsta.plugins.list",
+    "kinsta_plugins_list",
     {
       title: "List Plugins",
       description: "List all plugins for a Kinsta environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -46,98 +43,92 @@ export function registerPluginThemeTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.plugins.update",
+    "kinsta_plugins_update",
     {
       title: "Update Plugin",
       description:
         "Update a single plugin to the latest version. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        plugin_id: z.string().describe("The plugin ID to update"),
+        name: z.string().describe("The plugin name/slug to update"),
+        update_version: z.string().describe("The plugin version to install"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-      const pluginIdError = validateId(args.plugin_id, "plugin_id");
-      if (pluginIdError) return formatValidationError(pluginIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/plugins/${args.plugin_id}`,
+        path: `/sites/environments/${args.env_id}/plugins`,
         method: "PUT",
+        body: { name: args.name, update_version: args.update_version },
       });
 
       if (!result.success) return formatError(result.error, "plugin");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.plugins.bulk-update",
+    "kinsta_plugins_bulk-update",
     {
       title: "Bulk Update Plugins",
       description:
         "Update multiple plugins to their latest versions at once. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        plugin_ids: z
-          .array(z.string())
-          .describe("Array of plugin IDs to update"),
+        plugins: z
+          .array(z.object({ name: z.string() }))
+          .describe("Plugins to update, identified by name/slug"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
         path: `/sites/environments/${args.env_id}/plugins/bulk-update`,
         method: "PUT",
-        body: { plugin_ids: args.plugin_ids },
+        body: { plugins: args.plugins },
       });
 
       if (!result.success) return formatError(result.error, "plugin");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.plugins.list-wp",
+    "kinsta_plugins_list-wp",
     {
       title: "List WordPress Plugins",
       description:
         "List WordPress plugins with details from the WordPress.org repository for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
+        status: z.enum(["active", "inactive"]).optional(),
+        column: z.enum(["vulnerable", "updatesAvailable"]).optional(),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/wordpress-plugins`,
+        path: `/sites/environments/${args.env_id}/wp-plugins`,
         method: "GET",
+        params: buildParams({ status: args.status, column: args.column }),
       });
 
       if (!result.success) return formatError(result.error, "plugin");
@@ -148,27 +139,24 @@ export function registerPluginThemeTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
   // Themes
   // ---------------------------------------------------------------------------
-
   server.registerTool(
-    "kinsta.themes.list",
+    "kinsta_themes_list",
     {
       title: "List Themes",
       description: "List all themes for a Kinsta environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -180,96 +168,92 @@ export function registerPluginThemeTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.themes.update",
+    "kinsta_themes_update",
     {
       title: "Update Theme",
       description:
         "Update a single theme to the latest version. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        theme_id: z.string().describe("The theme ID to update"),
+        name: z.string().describe("The theme name/slug to update"),
+        update_version: z.string().describe("The theme version to install"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-      const themeIdError = validateId(args.theme_id, "theme_id");
-      if (themeIdError) return formatValidationError(themeIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/themes/${args.theme_id}`,
+        path: `/sites/environments/${args.env_id}/themes`,
         method: "PUT",
+        body: { name: args.name, update_version: args.update_version },
       });
 
       if (!result.success) return formatError(result.error, "theme");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.themes.bulk-update",
+    "kinsta_themes_bulk-update",
     {
       title: "Bulk Update Themes",
       description:
         "Update multiple themes to their latest versions at once. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        theme_ids: z.array(z.string()).describe("Array of theme IDs to update"),
+        themes: z
+          .array(z.object({ name: z.string() }))
+          .describe("Themes to update, identified by name/slug"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
         path: `/sites/environments/${args.env_id}/themes/bulk-update`,
         method: "PUT",
-        body: { theme_ids: args.theme_ids },
+        body: { themes: args.themes },
       });
 
       if (!result.success) return formatError(result.error, "theme");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.themes.list-wp",
+    "kinsta_themes_list-wp",
     {
       title: "List WordPress Themes",
       description:
         "List WordPress themes with details from the WordPress.org repository for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
+        status: z.enum(["active", "inactive"]).optional(),
+        column: z.enum(["vulnerable", "updatesAvailable"]).optional(),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/wordpress-themes`,
+        path: `/sites/environments/${args.env_id}/wp-themes`,
         method: "GET",
+        params: buildParams({ status: args.status, column: args.column }),
       });
 
       if (!result.success) return formatError(result.error, "theme");

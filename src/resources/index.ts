@@ -3,10 +3,10 @@
  *
  * Registers all available resources with the MCP server.
  */
-
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { ResourceTemplate } from "@modelcontextprotocol/server";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { getKinstaClientOrThrow } from "../kinsta/client-factory.js";
+import { mcpSafeName } from "../utils/slug.js";
 
 /**
  * Register all resources with the MCP server
@@ -19,8 +19,8 @@ export function registerResources(server: McpServer): void {
       title: "Kinsta Sites",
       description: "List all WordPress sites in your Kinsta company",
     },
-    async (_uri, extra) => {
-      const client = getKinstaClientOrThrow(extra);
+    async (_uri, ctx) => {
+      const client = getKinstaClientOrThrow(ctx);
       const companyId = client.getCompanyId();
       const result = await client.request<unknown>({
         path: "/sites",
@@ -65,7 +65,8 @@ export function registerResources(server: McpServer): void {
         return {
           resources: result.data.company.sites.map((site) => ({
             uri: `kinsta://sites/${site.id}`,
-            name: site.name,
+            name: mcpSafeName(site.name),
+            title: site.name,
           })),
         };
       },
@@ -74,8 +75,8 @@ export function registerResources(server: McpServer): void {
       title: "Site Details",
       description: "Get details for a specific Kinsta site",
     },
-    async (_uri, variables, extra) => {
-      const client = getKinstaClientOrThrow(extra);
+    async (_uri, variables, ctx) => {
+      const client = getKinstaClientOrThrow(ctx);
       const siteId = String(variables["site_id"]);
       const result = await client.request<unknown>({
         path: `/sites/${siteId}`,
@@ -119,7 +120,8 @@ export function registerResources(server: McpServer): void {
         return {
           resources: result.data.company.sites.map((site) => ({
             uri: `kinsta://sites/${site.id}/environments`,
-            name: `${site.name} Environments`,
+            name: mcpSafeName(`${site.name}_environments`),
+            title: `${site.name} Environments`,
           })),
         };
       },
@@ -128,8 +130,8 @@ export function registerResources(server: McpServer): void {
       title: "Site Environments",
       description: "List environments for a Kinsta site",
     },
-    async (_uri, variables, extra) => {
-      const client = getKinstaClientOrThrow(extra);
+    async (_uri, variables, ctx) => {
+      const client = getKinstaClientOrThrow(ctx);
       const siteId = String(variables["site_id"]);
       const result = await client.request<unknown>({
         path: `/sites/${siteId}/environments`,
@@ -161,8 +163,8 @@ export function registerResources(server: McpServer): void {
       title: "Available Regions",
       description: "List available deployment regions",
     },
-    async (_uri, extra) => {
-      const client = getKinstaClientOrThrow(extra);
+    async (_uri, ctx) => {
+      const client = getKinstaClientOrThrow(ctx);
       const companyId = client.getCompanyId();
       const result = await client.request<unknown>({
         path: `/company/${companyId}/available-regions`,

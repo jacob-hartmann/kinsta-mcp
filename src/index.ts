@@ -16,9 +16,8 @@
  */
 
 import { createRequire } from "node:module";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
+import { McpServer } from "@modelcontextprotocol/server";
 import { registerTools } from "./tools/index.js";
 import { registerResources } from "./resources/index.js";
 import { registerPrompts } from "./prompts/index.js";
@@ -31,15 +30,6 @@ const packageJson = require("../package.json") as { version: string };
 const SERVER_VERSION = packageJson.version;
 
 /**
- * Start the server in stdio mode
- */
-async function startStdioServer(server: McpServer): Promise<void> {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error(`[${SERVER_NAME}] Server running on stdio transport`);
-}
-
-/**
  * Create an MCP server with all handlers registered
  */
 function createServer(): McpServer {
@@ -48,9 +38,9 @@ function createServer(): McpServer {
     {
       instructions:
         "Kinsta MCP server for managing WordPress sites on Kinsta hosting. " +
-        "Start with kinsta.ping to verify connectivity. Use kinsta.sites.list to discover sites, " +
-        "then kinsta.environments.list to find environments. Most mutating operations return an " +
-        "operation_id — poll kinsta.operations.status to track progress. " +
+        "Start with kinsta_ping to verify connectivity. Use kinsta_sites_list to discover sites, " +
+        "then kinsta_environments_list to find environments. Most mutating operations return an " +
+        "operation_id — poll kinsta_operations_status to track progress. " +
         "Environment IDs (env_id) are required for most tools.",
     }
   );
@@ -65,24 +55,26 @@ function createServer(): McpServer {
 /**
  * Main entry point
  */
-async function main(): Promise<void> {
+function main(): void {
   console.error(
     `[${SERVER_NAME}] Starting server v${SERVER_VERSION} (stdio transport)...`
   );
-  const server = createServer();
+  const handle = serveStdio(createServer);
 
   process.on("SIGTERM", () => {
-    void server.close();
+    void handle.close();
   });
   process.on("SIGINT", () => {
-    void server.close();
+    void handle.close();
   });
 
-  await startStdioServer(server);
+  console.error(`[${SERVER_NAME}] Server running on stdio transport`);
 }
 
 // Run the server
-main().catch((error: unknown) => {
+try {
+  main();
+} catch (error: unknown) {
   console.error(`[${SERVER_NAME}] Fatal error:`, error);
   process.exit(1);
-});
+}

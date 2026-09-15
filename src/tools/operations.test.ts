@@ -24,13 +24,13 @@ describe("Operation Tools", () => {
   });
 
   it("should register both tools", () => {
-    expect(ctx.tools.has("kinsta.operations.status")).toBe(true);
-    expect(ctx.tools.has("kinsta.auth.validate")).toBe(true);
+    expect(ctx.tools.has("kinsta_operations_status")).toBe(true);
+    expect(ctx.tools.has("kinsta_auth_validate")).toBe(true);
   });
 
-  describe("kinsta.operations.status", () => {
+  describe("kinsta_operations_status", () => {
     it("should return validation error for invalid operation_id", async () => {
-      const result = await ctx.callTool("kinsta.operations.status", {
+      const result = await ctx.callTool("kinsta_operations_status", {
         operation_id: "../bad",
       });
       expect(result).toHaveProperty("isError", true);
@@ -39,7 +39,7 @@ describe("Operation Tools", () => {
 
     it("should return auth error", async () => {
       mockClientAuthFailure(getKinstaClientMock);
-      const result = await ctx.callTool("kinsta.operations.status", {
+      const result = await ctx.callTool("kinsta_operations_status", {
         operation_id: "op-123",
       });
       expect(result).toHaveProperty("isError", true);
@@ -50,7 +50,7 @@ describe("Operation Tools", () => {
       mockClientSuccess(getKinstaClientMock, ctx);
       mockRequestError(ctx, "NOT_FOUND", "not found");
 
-      const result = await ctx.callTool("kinsta.operations.status", {
+      const result = await ctx.callTool("kinsta_operations_status", {
         operation_id: "op-123",
       });
       expect(result).toHaveProperty("isError", true);
@@ -60,7 +60,7 @@ describe("Operation Tools", () => {
       mockClientSuccess(getKinstaClientMock, ctx);
       mockRequestSuccess(ctx, { status: "complete" });
 
-      const result = await ctx.callTool("kinsta.operations.status", {
+      const result = await ctx.callTool("kinsta_operations_status", {
         operation_id: "op-123",
       });
       expect(result).not.toHaveProperty("isError");
@@ -74,10 +74,10 @@ describe("Operation Tools", () => {
     });
   });
 
-  describe("kinsta.auth.validate", () => {
+  describe("kinsta_auth_validate", () => {
     it("should return auth error", async () => {
       mockClientAuthFailure(getKinstaClientMock);
-      const result = await ctx.callTool("kinsta.auth.validate", {});
+      const result = await ctx.callTool("kinsta_auth_validate", {});
       expect(result).toHaveProperty("isError", true);
     });
 
@@ -85,7 +85,7 @@ describe("Operation Tools", () => {
       mockClientSuccess(getKinstaClientMock, ctx);
       mockRequestError(ctx, "UNAUTHORIZED", "bad key");
 
-      const result = await ctx.callTool("kinsta.auth.validate", {});
+      const result = await ctx.callTool("kinsta_auth_validate", {});
       expect(result).toHaveProperty("isError", true);
     });
 
@@ -93,7 +93,7 @@ describe("Operation Tools", () => {
       mockClientSuccess(getKinstaClientMock, ctx);
       mockRequestSuccess(ctx, { valid: true });
 
-      const result = await ctx.callTool("kinsta.auth.validate", {});
+      const result = await ctx.callTool("kinsta_auth_validate", {});
       expect(result).not.toHaveProperty("isError");
 
       expect(ctx.mockClient.request).toHaveBeenCalledWith(

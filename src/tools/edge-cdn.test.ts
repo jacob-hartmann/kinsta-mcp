@@ -24,15 +24,15 @@ describe("Edge CDN Tools", () => {
   });
 
   it("should register all 4 tools", () => {
-    expect(ctx.tools.has("kinsta.edge-cache.clear")).toBe(true);
-    expect(ctx.tools.has("kinsta.edge-cache.toggle")).toBe(true);
-    expect(ctx.tools.has("kinsta.cdn.clear-cache")).toBe(true);
-    expect(ctx.tools.has("kinsta.cdn.image-optimization")).toBe(true);
+    expect(ctx.tools.has("kinsta_edge-cache_clear")).toBe(true);
+    expect(ctx.tools.has("kinsta_edge-cache_toggle")).toBe(true);
+    expect(ctx.tools.has("kinsta_cdn_clear-cache")).toBe(true);
+    expect(ctx.tools.has("kinsta_cdn_image-optimization")).toBe(true);
   });
 
-  describe("kinsta.edge-cache.clear", () => {
+  describe("kinsta_edge-cache_clear", () => {
     it("should validate env_id", async () => {
-      const result = await ctx.callTool("kinsta.edge-cache.clear", {
+      const result = await ctx.callTool("kinsta_edge-cache_clear", {
         env_id: "../bad",
       });
       expect(result).toHaveProperty("isError", true);
@@ -40,7 +40,7 @@ describe("Edge CDN Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.edge-cache.clear", {
+      const result = await ctx.callTool("kinsta_edge-cache_clear", {
         env_id: "env-1",
       });
       expect((result as any).content[0].text).toContain("Authentication Error");
@@ -49,7 +49,7 @@ describe("Edge CDN Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.edge-cache.clear", {
+      const result = await ctx.callTool("kinsta_edge-cache_clear", {
         env_id: "env-1",
       });
       expect(result).toHaveProperty("isError", true);
@@ -58,33 +58,53 @@ describe("Edge CDN Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { operation_id: "op-1" });
-      const result = await ctx.callTool("kinsta.edge-cache.clear", {
+      const result = await ctx.callTool("kinsta_edge-cache_clear", {
         env_id: "env-1",
       });
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
-          path: "/sites/environments/env-1/edge-cache/clear",
+          path: "/sites/edge-caching/clear",
           method: "POST",
+          body: { environment_id: "env-1" },
+        })
+      );
+    });
+
+    it("should include optional cache settings", async () => {
+      mockClientSuccess(mock, ctx);
+      mockRequestSuccess(ctx, { operation_id: "op-1" });
+      await ctx.callTool("kinsta_edge-cache_clear", {
+        env_id: "env-1",
+        clear_subdirectories: true,
+        url: "/products",
+      });
+      expect(ctx.mockClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: {
+            environment_id: "env-1",
+            clear_subdirectories: true,
+            url: "/products",
+          },
         })
       );
     });
   });
 
-  describe("kinsta.edge-cache.toggle", () => {
+  describe("kinsta_edge-cache_toggle", () => {
     it("should validate env_id", async () => {
-      const result = await ctx.callTool("kinsta.edge-cache.toggle", {
+      const result = await ctx.callTool("kinsta_edge-cache_toggle", {
         env_id: "../bad",
-        is_enabled: true,
+        enabled: true,
       });
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.edge-cache.toggle", {
+      const result = await ctx.callTool("kinsta_edge-cache_toggle", {
         env_id: "env-1",
-        is_enabled: true,
+        enabled: true,
       });
       expect(result).toHaveProperty("isError", true);
     });
@@ -92,9 +112,9 @@ describe("Edge CDN Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.edge-cache.toggle", {
+      const result = await ctx.callTool("kinsta_edge-cache_toggle", {
         env_id: "env-1",
-        is_enabled: true,
+        enabled: true,
       });
       expect(result).toHaveProperty("isError", true);
     });
@@ -102,33 +122,35 @@ describe("Edge CDN Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { ok: true });
-      const result = await ctx.callTool("kinsta.edge-cache.toggle", {
+      const result = await ctx.callTool("kinsta_edge-cache_toggle", {
         env_id: "env-1",
-        is_enabled: true,
+        enabled: true,
       });
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
-          path: "/sites/environments/env-1/edge-cache/status",
+          path: "/sites/edge-caching/status",
           method: "PUT",
-          body: { is_enabled: true },
+          body: { environment_id: "env-1", enabled: true },
         })
       );
     });
   });
 
-  describe("kinsta.cdn.clear-cache", () => {
+  describe("kinsta_cdn_clear-cache", () => {
     it("should validate env_id", async () => {
-      const result = await ctx.callTool("kinsta.cdn.clear-cache", {
+      const result = await ctx.callTool("kinsta_cdn_clear-cache", {
         env_id: "../bad",
+        cdn_cache_id: "cdn-1",
       });
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.cdn.clear-cache", {
+      const result = await ctx.callTool("kinsta_cdn_clear-cache", {
         env_id: "env-1",
+        cdn_cache_id: "cdn-1",
       });
       expect(result).toHaveProperty("isError", true);
     });
@@ -136,8 +158,9 @@ describe("Edge CDN Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.cdn.clear-cache", {
+      const result = await ctx.callTool("kinsta_cdn_clear-cache", {
         env_id: "env-1",
+        cdn_cache_id: "cdn-1",
       });
       expect(result).toHaveProperty("isError", true);
     });
@@ -145,63 +168,72 @@ describe("Edge CDN Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { operation_id: "op-1" });
-      const result = await ctx.callTool("kinsta.cdn.clear-cache", {
+      const result = await ctx.callTool("kinsta_cdn_clear-cache", {
         env_id: "env-1",
+        cdn_cache_id: "cdn-1",
       });
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
-          path: "/sites/environments/env-1/cdn-cache/clear",
+          path: "/sites/cdn/clear-cache",
           method: "POST",
+          body: { environment_id: "env-1", cdn_cache_id: "cdn-1" },
         })
       );
     });
   });
 
-  describe("kinsta.cdn.image-optimization", () => {
+  describe("kinsta_cdn_image-optimization", () => {
     it("should validate env_id", async () => {
-      const result = await ctx.callTool("kinsta.cdn.image-optimization", {
+      const result = await ctx.callTool("kinsta_cdn_image-optimization", {
         env_id: "../bad",
-        is_enabled: true,
+        image_optimization_type: "lossy",
       });
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.cdn.image-optimization", {
+      const result = await ctx.callTool("kinsta_cdn_image-optimization", {
         env_id: "env-1",
-        is_enabled: true,
+        image_optimization_type: "lossy",
       });
       expect(result).toHaveProperty("isError", true);
     });
 
-    it("should return success without is_lossless", async () => {
+    it("should return success for lossy optimization", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { ok: true });
-      const result = await ctx.callTool("kinsta.cdn.image-optimization", {
+      const result = await ctx.callTool("kinsta_cdn_image-optimization", {
         env_id: "env-1",
-        is_enabled: true,
+        image_optimization_type: "lossy",
       });
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
-          body: { is_enabled: true },
+          path: "/sites/cdn/image-optimization",
+          method: "PUT",
+          body: {
+            environment_id: "env-1",
+            image_optimization_type: "lossy",
+          },
         })
       );
     });
 
-    it("should include is_lossless when provided", async () => {
+    it("should support lossless optimization", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { ok: true });
-      await ctx.callTool("kinsta.cdn.image-optimization", {
+      await ctx.callTool("kinsta_cdn_image-optimization", {
         env_id: "env-1",
-        is_enabled: true,
-        is_lossless: true,
+        image_optimization_type: "lossless",
       });
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
-          body: { is_enabled: true, is_lossless: true },
+          body: {
+            environment_id: "env-1",
+            image_optimization_type: "lossless",
+          },
         })
       );
     });
@@ -209,9 +241,9 @@ describe("Edge CDN Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.cdn.image-optimization", {
+      const result = await ctx.callTool("kinsta_cdn_image-optimization", {
         env_id: "env-1",
-        is_enabled: true,
+        image_optimization_type: false,
       });
       expect(result).toHaveProperty("isError", true);
     });

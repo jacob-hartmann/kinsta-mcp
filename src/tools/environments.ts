@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
 import {
@@ -7,7 +7,6 @@ import {
   formatSuccess,
   formatValidationError,
   buildParams,
-  kinstaOutputSchema,
   validateId,
 } from "./utils.js";
 
@@ -15,27 +14,24 @@ export function registerEnvironmentTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
-
   server.registerTool(
-    "kinsta.environments.list",
+    "kinsta_environments_list",
     {
       title: "List Environments",
       description: "List all environments for a Kinsta site.",
       inputSchema: z.object({
         site_id: z.string().describe("The site ID to list environments for"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.site_id, "site_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -47,9 +43,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.create",
+    "kinsta_environments_create",
     {
       title: "Create Environment",
       description:
@@ -81,14 +76,12 @@ export function registerEnvironmentTools(server: McpServer): void {
           .describe("Install Easy Digital Downloads"),
         wordpressseo: z.boolean().optional().describe("Install Yoast SEO"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.site_id, "site_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const body: Record<string, unknown> = {
@@ -121,9 +114,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.create-plain",
+    "kinsta_environments_create-plain",
     {
       title: "Create Plain Environment",
       description:
@@ -137,14 +129,12 @@ export function registerEnvironmentTools(server: McpServer): void {
           .boolean()
           .describe("Whether this is a premium staging environment"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.site_id, "site_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -160,9 +150,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.clone",
+    "kinsta_environments_clone",
     {
       title: "Clone Environment",
       description:
@@ -181,14 +170,12 @@ export function registerEnvironmentTools(server: McpServer): void {
           .string()
           .describe("Source environment ID to clone from"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.site_id, "site_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -205,9 +192,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.push",
+    "kinsta_environments_push",
     {
       title: "Push Environment",
       description:
@@ -235,14 +221,12 @@ export function registerEnvironmentTools(server: McpServer): void {
             "List of specific files to push (when push_files_option is SPECIFIC_FILES)"
           ),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { destructiveHint: true, openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.site_id, "site_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const body: Record<string, unknown> = {
@@ -267,23 +251,20 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.delete",
+    "kinsta_environments_delete",
     {
       title: "Delete Environment",
       description: "Delete an environment. This action cannot be undone.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID to delete"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { destructiveHint: true, openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -299,9 +280,8 @@ export function registerEnvironmentTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
   // PHP & Configuration
   // ---------------------------------------------------------------------------
-
   server.registerTool(
-    "kinsta.environments.php-allocation",
+    "kinsta_environments_php-allocation",
     {
       title: "Change PHP Allocation",
       description:
@@ -313,18 +293,16 @@ export function registerEnvironmentTools(server: McpServer): void {
           .number()
           .describe("Memory per PHP worker thread in MB"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/php-allocation`,
+        path: `/sites/environments/${args.env_id}/change-environment-php-allocation`,
         method: "POST",
         body: {
           thread_count: args.thread_count,
@@ -336,9 +314,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.php-allocation-site",
+    "kinsta_environments_php-allocation-site",
     {
       title: "Change Site PHP Allocation",
       description:
@@ -350,18 +327,16 @@ export function registerEnvironmentTools(server: McpServer): void {
           .number()
           .describe("Memory per PHP worker thread in MB"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.site_id, "site_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/${args.site_id}/php-allocation`,
+        path: `/sites/${args.site_id}/change-site-php-allocation`,
         method: "POST",
         body: {
           thread_count: args.thread_count,
@@ -373,16 +348,18 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.webroot",
+    "kinsta_environments_webroot",
     {
       title: "Change Webroot",
       description:
         "Change the webroot subfolder for an environment. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        web_root_subfolder: z.string().describe("New webroot subfolder path"),
+        web_root_subfolder: z
+          .string()
+          .regex(/^\/(?:[a-zA-Z0-9_-]+\/?)*$/)
+          .describe("New webroot subfolder path"),
         clear_all_cache: z
           .boolean()
           .optional()
@@ -392,14 +369,12 @@ export function registerEnvironmentTools(server: McpServer): void {
           .optional()
           .describe("Refresh plugins and themes after change"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const body: Record<string, unknown> = {
@@ -411,7 +386,7 @@ export function registerEnvironmentTools(server: McpServer): void {
         body["refresh_plugins_and_themes"] = args.refresh_plugins_and_themes;
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/webroot`,
+        path: `/sites/environments/${args.env_id}/change-webroot-subfolder`,
         method: "POST",
         body,
       });
@@ -424,31 +399,28 @@ export function registerEnvironmentTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
   // Files & Redirects
   // ---------------------------------------------------------------------------
-
   server.registerTool(
-    "kinsta.environments.files",
+    "kinsta_environments_files",
     {
       title: "List Files",
       description: "List files in an environment's file system.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/files`,
+        path: `/sites/environments/${args.env_id}/file-list`,
         method: "GET",
       });
 
@@ -456,9 +428,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.redirects",
+    "kinsta_environments_redirects",
     {
       title: "List Redirects",
       description:
@@ -481,22 +452,20 @@ export function registerEnvironmentTools(server: McpServer): void {
           .optional()
           .describe("Whether to use regex for search"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/redirect-rules`,
+        path: `/sites/environments/${args.env_id}/redirect-rules`,
         method: "GET",
         params: buildParams({
           limit: args.limit?.toString(),
@@ -512,9 +481,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.redirects.update",
+    "kinsta_environments_redirects_update",
     {
       title: "Update Redirects",
       description:
@@ -548,14 +516,12 @@ export function registerEnvironmentTools(server: McpServer): void {
           .optional()
           .describe("Whether to use regex for search"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { destructiveHint: true, openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const body: Record<string, unknown> = {
@@ -574,7 +540,7 @@ export function registerEnvironmentTools(server: McpServer): void {
         body["regex_search"] = args.regex_search;
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/redirect-rules`,
+        path: `/sites/environments/${args.env_id}/redirect-rules`,
         method: "POST",
         body,
       });
@@ -587,31 +553,28 @@ export function registerEnvironmentTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
   // SFTP/SSH
   // ---------------------------------------------------------------------------
-
   server.registerTool(
-    "kinsta.environments.ssh.status",
+    "kinsta_environments_ssh_status",
     {
       title: "Get SSH Status",
       description: "Get the SSH/SFTP status for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/sftp-ssh/status`,
+        path: `/sites/environments/${args.env_id}/ssh/get-status`,
         method: "GET",
       });
 
@@ -619,9 +582,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.ssh.toggle",
+    "kinsta_environments_ssh_toggle",
     {
       title: "Toggle SSH",
       description: "Enable or disable SSH/SFTP access for an environment.",
@@ -631,18 +593,16 @@ export function registerEnvironmentTools(server: McpServer): void {
           .boolean()
           .describe("Whether to enable (true) or disable (false) SSH"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/sftp-ssh`,
+        path: `/sites/environments/${args.env_id}/ssh/set-status`,
         method: "POST",
         body: { is_enabled: args.is_enabled },
       });
@@ -651,9 +611,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.ssh.password-access",
+    "kinsta_environments_ssh_password-access",
     {
       title: "Toggle SSH Password Access",
       description:
@@ -666,14 +625,12 @@ export function registerEnvironmentTools(server: McpServer): void {
             "Whether to enable (true) or disable (false) password access"
           ),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -686,27 +643,24 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.ssh.generate-password",
+    "kinsta_environments_ssh_generate-password",
     {
       title: "Generate SSH Password",
       description: "Generate a new SSH/SFTP password for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/sftp-password`,
+        path: `/sites/environments/${args.env_id}/ssh/generate-password`,
         method: "POST",
       });
 
@@ -714,31 +668,28 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.ssh.password",
+    "kinsta_environments_ssh_password",
     {
       title: "Get SSH Password",
       description: "Get the current SSH/SFTP password for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/sftp-password`,
+        path: `/sites/environments/${args.env_id}/ssh/password`,
         method: "GET",
       });
 
@@ -746,31 +697,28 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.ssh.ip-allowlist",
+    "kinsta_environments_ssh_ip-allowlist",
     {
       title: "Get SSH IP Allowlist",
       description: "Get the SSH IP allowlist for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/sftp-allowlist`,
+        path: `/sites/environments/${args.env_id}/ssh/get-allowed-ips`,
         method: "GET",
       });
 
@@ -778,9 +726,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.ssh.ip-allowlist.update",
+    "kinsta_environments_ssh_ip-allowlist_update",
     {
       title: "Update SSH IP Allowlist",
       description: "Update the SSH IP allowlist for an environment.",
@@ -790,18 +737,16 @@ export function registerEnvironmentTools(server: McpServer): void {
           .array(z.string())
           .describe("List of IP addresses to allow SSH access"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/sftp-allowlist`,
+        path: `/sites/environments/${args.env_id}/ssh/set-allowed-ips`,
         method: "POST",
         body: { ip_allowlist: args.ip_allowlist },
       });
@@ -810,31 +755,29 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.ssh.config",
+    "kinsta_environments_ssh_config",
     {
       title: "Get SSH Config",
       description: "Get SSH connection configuration for an environment.",
       inputSchema: z.object({
+        site_id: z.string().describe("The site ID"),
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/sftp-config`,
+        path: `/sites/${args.site_id}/environments/${args.env_id}/ssh/config`,
         method: "GET",
       });
 
@@ -842,9 +785,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.ssh.password-expiration",
+    "kinsta_environments_ssh_password-expiration",
     {
       title: "Change SSH Password Expiration",
       description:
@@ -857,18 +799,16 @@ export function registerEnvironmentTools(server: McpServer): void {
             "Password expiration interval (e.g. days_7, days_14, days_30)"
           ),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/sftp-expiration`,
+        path: `/sites/environments/${args.env_id}/ssh/change-expiration-interval`,
         method: "POST",
         body: { exp_interval: args.exp_interval },
       });
@@ -881,9 +821,8 @@ export function registerEnvironmentTools(server: McpServer): void {
   // ---------------------------------------------------------------------------
   // WP-CLI & phpMyAdmin
   // ---------------------------------------------------------------------------
-
   server.registerTool(
-    "kinsta.environments.wp-cli",
+    "kinsta_environments_wp-cli",
     {
       title: "Run WP-CLI Command",
       description:
@@ -892,24 +831,23 @@ export function registerEnvironmentTools(server: McpServer): void {
         env_id: z.string().describe("The environment ID"),
         wp_command: z
           .string()
+          .max(5000)
           .describe("WP-CLI command to run (must start with 'wp ')"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { destructiveHint: true, openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       if (!args.wp_command.startsWith("wp ")) {
         return formatValidationError('WP-CLI command must start with "wp "');
       }
 
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/wp-cli`,
+        path: `/sites/environments/${args.env_id}/run-wp-cli-command`,
         method: "POST",
         body: { wp_command: args.wp_command },
       });
@@ -918,9 +856,8 @@ export function registerEnvironmentTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.environments.phpmyadmin",
+    "kinsta_environments_phpmyadmin",
     {
       title: "Get phpMyAdmin Token",
       description:
@@ -928,21 +865,104 @@ export function registerEnvironmentTools(server: McpServer): void {
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.env_id, "env_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/phpmyadmin-login`,
+        path: `/sites/environments/${args.env_id}/pma-login-token`,
         method: "POST",
       });
 
+      if (!result.success) return formatError(result.error, "environment");
+      return formatSuccess(result.data);
+    }
+  );
+  server.registerTool(
+    "kinsta_environments_wpa_login-url",
+    {
+      title: "Get WordPress Admin Login URL",
+      description: "Create a WordPress admin login URL for an existing user.",
+      inputSchema: z.object({
+        env_id: z.string().describe("The environment ID"),
+        email: z.email().describe("The WordPress admin email"),
+      }),
+      annotations: { openWorldHint: true },
+    },
+    async (args, ctx) => {
+      const idError = validateId(args.env_id, "env_id");
+      if (idError) return formatValidationError(idError);
+      const clientResult = getKinstaClient(ctx);
+      if (!clientResult.success) return formatAuthError(clientResult.error);
+      const result = await clientResult.client.request<unknown>({
+        path: `/sites/environments/${args.env_id}/wpa-login-url`,
+        method: "POST",
+        body: { email: args.email },
+      });
+      if (!result.success) return formatError(result.error, "environment");
+      return formatSuccess(result.data);
+    }
+  );
+  server.registerTool(
+    "kinsta_environments_wpa_create-user",
+    {
+      title: "Create WordPress Admin User",
+      description: "Create a WordPress admin user in an environment.",
+      inputSchema: z.object({
+        env_id: z.string().describe("The environment ID"),
+        email: z.email().describe("The new WordPress admin email"),
+        first_name: z.string(),
+        last_name: z.string(),
+      }),
+      annotations: { openWorldHint: true },
+    },
+    async (args, ctx) => {
+      const idError = validateId(args.env_id, "env_id");
+      if (idError) return formatValidationError(idError);
+      const clientResult = getKinstaClient(ctx);
+      if (!clientResult.success) return formatAuthError(clientResult.error);
+      const result = await clientResult.client.request<unknown>({
+        path: `/sites/environments/${args.env_id}/wpa-create-user`,
+        method: "POST",
+        body: {
+          email: args.email,
+          first_name: args.first_name,
+          last_name: args.last_name,
+        },
+      });
+      if (!result.success) return formatError(result.error, "environment");
+      return formatSuccess(result.data);
+    }
+  );
+  server.registerTool(
+    "kinsta_environments_wpa_user-exists",
+    {
+      title: "Check WordPress Admin User",
+      description: "Check whether a WordPress admin user exists by email.",
+      inputSchema: z.object({
+        env_id: z.string().describe("The environment ID"),
+        email: z.email().describe("The WordPress admin email"),
+      }),
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async (args, ctx) => {
+      const idError = validateId(args.env_id, "env_id");
+      if (idError) return formatValidationError(idError);
+      const clientResult = getKinstaClient(ctx);
+      if (!clientResult.success) return formatAuthError(clientResult.error);
+      const result = await clientResult.client.request<unknown>({
+        path: `/sites/environments/${args.env_id}/wpa-user-exists`,
+        method: "GET",
+        params: { email: args.email },
+      });
       if (!result.success) return formatError(result.error, "environment");
       return formatSuccess(result.data);
     }

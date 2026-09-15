@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
 import {
@@ -6,31 +6,28 @@ import {
   formatError,
   formatSuccess,
   formatValidationError,
-  kinstaOutputSchema,
   validateId,
 } from "./utils.js";
 
 export function registerSftpUserTools(server: McpServer): void {
   server.registerTool(
-    "kinsta.sftp-users.list",
+    "kinsta_sftp-users_list",
     {
       title: "List SFTP Users",
       description: "List additional SFTP/SSH user accounts for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -42,44 +39,40 @@ export function registerSftpUserTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.sftp-users.toggle",
+    "kinsta_sftp-users_toggle",
     {
       title: "Toggle SFTP Users",
       description:
         "Enable or disable additional SFTP/SSH accounts for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        is_enabled: z
+        enabled: z
           .boolean()
           .describe(
             "Whether to enable (true) or disable (false) additional accounts"
           ),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/additional-sftp-accounts/toggle`,
+        path: `/sites/environments/${args.env_id}/additional-sftp-accounts/toggle-status`,
         method: "PUT",
-        body: { is_enabled: args.is_enabled },
+        body: { enabled: args.enabled },
       });
 
       if (!result.success) return formatError(result.error, "SFTP account");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.sftp-users.add",
+    "kinsta_sftp-users_add",
     {
       title: "Add SFTP User",
       description:
@@ -87,16 +80,21 @@ export function registerSftpUserTools(server: McpServer): void {
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
         username: z.string().describe("Username for the new SFTP account"),
-        password: z.string().describe("Password for the new SFTP account"),
+        password: z
+          .string()
+          .min(16)
+          .describe(
+            "Password for the new SFTP account (minimum 16 characters)"
+          ),
+        root_directory: z.string().optional(),
+        permission: z.enum(["read", "write"]).optional(),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -105,6 +103,10 @@ export function registerSftpUserTools(server: McpServer): void {
         body: {
           username: args.username,
           password: args.password,
+          ...(args.root_directory !== undefined && {
+            root_directory: args.root_directory,
+          }),
+          ...(args.permission !== undefined && { permission: args.permission }),
         },
       });
 
@@ -112,31 +114,28 @@ export function registerSftpUserTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.sftp-users.remove",
+    "kinsta_sftp-users_remove",
     {
       title: "Remove SFTP User",
       description:
         "Remove an additional SFTP/SSH user account from an environment.",
       inputSchema: z.object({
-        env_id: z.string().describe("The environment ID"),
-        account_id: z.string().describe("The SFTP account ID to remove"),
+        sftp_account_id: z.string().describe("The SFTP account ID to remove"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { destructiveHint: true, openWorldHint: true },
     },
-    async (args, extra) => {
-      const envIdError = validateId(args.env_id, "env_id");
-      if (envIdError) return formatValidationError(envIdError);
-      const accountIdError = validateId(args.account_id, "account_id");
+    async (args, ctx) => {
+      const accountIdError = validateId(
+        args.sftp_account_id,
+        "sftp_account_id"
+      );
       if (accountIdError) return formatValidationError(accountIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/additional-sftp-accounts/${args.account_id}`,
+        path: `/sites/environments/additional-sftp-accounts/${args.sftp_account_id}`,
         method: "DELETE",
       });
 

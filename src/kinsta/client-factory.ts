@@ -6,12 +6,7 @@
  *
  * Caches the client instance and invalidates when env vars change.
  */
-
-import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
-import type {
-  ServerRequest,
-  ServerNotification,
-} from "@modelcontextprotocol/sdk/types.js";
+import type { ServerContext } from "@modelcontextprotocol/server";
 import { KinstaClient } from "./client.js";
 import { loadKinstaConfig, KinstaAuthError } from "./auth.js";
 
@@ -19,8 +14,7 @@ import { loadKinstaConfig, KinstaAuthError } from "./auth.js";
  * Result type for getKinstaClient - allows callers to handle errors gracefully
  */
 export type KinstaClientResult =
-  | { success: true; client: KinstaClient }
-  | { success: false; error: string };
+  { success: true; client: KinstaClient } | { success: false; error: string };
 
 // ---------------------------------------------------------------------------
 // Client Cache
@@ -42,9 +36,7 @@ function getConfigHash(): string {
  * @param _extra - MCP request handler extra context (reserved for future use)
  * @returns Result with client or error message
  */
-export function getKinstaClient(
-  _extra: RequestHandlerExtra<ServerRequest, ServerNotification>
-): KinstaClientResult {
+export function getKinstaClient(_extra: ServerContext): KinstaClientResult {
   try {
     const hash = getConfigHash();
     if (cachedClient && cachedConfigHash === hash) {
@@ -79,9 +71,7 @@ export function getKinstaClient(
  * @returns KinstaClient instance
  * @throws Error if client cannot be created
  */
-export function getKinstaClientOrThrow(
-  extra: RequestHandlerExtra<ServerRequest, ServerNotification>
-): KinstaClient {
+export function getKinstaClientOrThrow(extra: ServerContext): KinstaClient {
   const result = getKinstaClient(extra);
   if (!result.success) {
     throw new Error(result.error);

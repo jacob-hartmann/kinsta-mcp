@@ -1,18 +1,17 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
 import {
   formatAuthError,
   formatError,
   formatSuccess,
-  kinstaOutputSchema,
   validateId,
   formatValidationError,
 } from "./utils.js";
 
 export function registerOperationTools(server: McpServer): void {
   server.registerTool(
-    "kinsta.operations.status",
+    "kinsta_operations_status",
     {
       title: "Check Operation Status",
       description:
@@ -24,18 +23,16 @@ export function registerOperationTools(server: McpServer): void {
           .string()
           .describe("The operation ID to check status for"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const idError = validateId(args.operation_id, "operation_id");
       if (idError) return formatValidationError(idError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
@@ -47,23 +44,21 @@ export function registerOperationTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.auth.validate",
+    "kinsta_auth_validate",
     {
       title: "Validate API Key",
       description:
         "Validate the current Kinsta API key. Returns account information if the key is valid.",
       inputSchema: z.object({}),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (_args, extra) => {
-      const clientResult = getKinstaClient(extra);
+    async (_args, ctx) => {
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
