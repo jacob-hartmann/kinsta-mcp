@@ -358,7 +358,7 @@ export function registerEnvironmentTools(server: McpServer): void {
         env_id: z.string().describe("The environment ID"),
         web_root_subfolder: z
           .string()
-          .regex(/^\/(?:[a-zA-Z0-9_-]+\/?)*$/)
+          .regex(/^(?:\/|\/[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*\/?)$/)
           .describe("New webroot subfolder path"),
         clear_all_cache: z
           .boolean()
