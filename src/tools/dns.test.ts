@@ -24,31 +24,31 @@ describe("DNS Tools", () => {
   });
 
   it("should register all 5 tools", () => {
-    expect(ctx.tools.has("kinsta.dns.domains")).toBe(true);
-    expect(ctx.tools.has("kinsta.dns.records")).toBe(true);
-    expect(ctx.tools.has("kinsta.dns.records.create")).toBe(true);
-    expect(ctx.tools.has("kinsta.dns.records.update")).toBe(true);
-    expect(ctx.tools.has("kinsta.dns.records.delete")).toBe(true);
+    expect(ctx.tools.has("kinsta_dns_domains")).toBe(true);
+    expect(ctx.tools.has("kinsta_dns_records")).toBe(true);
+    expect(ctx.tools.has("kinsta_dns_records_create")).toBe(true);
+    expect(ctx.tools.has("kinsta_dns_records_update")).toBe(true);
+    expect(ctx.tools.has("kinsta_dns_records_delete")).toBe(true);
   });
 
-  describe("kinsta.dns.domains", () => {
+  describe("kinsta_dns_domains", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.dns.domains", {});
+      const result = await ctx.callTool("kinsta_dns_domains", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.dns.domains", {});
+      const result = await ctx.callTool("kinsta_dns_domains", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { domains: [] });
-      const result = await ctx.callTool("kinsta.dns.domains", {});
+      const result = await ctx.callTool("kinsta_dns_domains", {});
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -60,9 +60,9 @@ describe("DNS Tools", () => {
     });
   });
 
-  describe("kinsta.dns.records", () => {
+  describe("kinsta_dns_records", () => {
     it("should validate domain_id", async () => {
-      const result = await ctx.callTool("kinsta.dns.records", {
+      const result = await ctx.callTool("kinsta_dns_records", {
         domain_id: "../bad",
       });
       expect(result).toHaveProperty("isError", true);
@@ -70,7 +70,7 @@ describe("DNS Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.dns.records", {
+      const result = await ctx.callTool("kinsta_dns_records", {
         domain_id: "dom-1",
       });
       expect(result).toHaveProperty("isError", true);
@@ -79,7 +79,7 @@ describe("DNS Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { records: [] });
-      const result = await ctx.callTool("kinsta.dns.records", {
+      const result = await ctx.callTool("kinsta_dns_records", {
         domain_id: "dom-1",
       });
       expect(result).not.toHaveProperty("isError");
@@ -94,14 +94,14 @@ describe("DNS Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "NOT_FOUND", "not found");
-      const result = await ctx.callTool("kinsta.dns.records", {
+      const result = await ctx.callTool("kinsta_dns_records", {
         domain_id: "dom-1",
       });
       expect(result).toHaveProperty("isError", true);
     });
   });
 
-  describe("kinsta.dns.records.create", () => {
+  describe("kinsta_dns_records_create", () => {
     const validArgs = {
       domain_id: "dom-1",
       type: "A",
@@ -111,7 +111,7 @@ describe("DNS Tools", () => {
     };
 
     it("should validate domain_id", async () => {
-      const result = await ctx.callTool("kinsta.dns.records.create", {
+      const result = await ctx.callTool("kinsta_dns_records_create", {
         ...validArgs,
         domain_id: "../bad",
       });
@@ -120,14 +120,14 @@ describe("DNS Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.dns.records.create", validArgs);
+      const result = await ctx.callTool("kinsta_dns_records_create", validArgs);
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { id: "rec-1" });
-      const result = await ctx.callTool("kinsta.dns.records.create", validArgs);
+      const result = await ctx.callTool("kinsta_dns_records_create", validArgs);
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -146,14 +146,14 @@ describe("DNS Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "VALIDATION_ERROR", "bad");
-      const result = await ctx.callTool("kinsta.dns.records.create", validArgs);
+      const result = await ctx.callTool("kinsta_dns_records_create", validArgs);
       expect(result).toHaveProperty("isError", true);
     });
   });
 
-  describe("kinsta.dns.records.update", () => {
+  describe("kinsta_dns_records_update", () => {
     it("should validate domain_id", async () => {
-      const result = await ctx.callTool("kinsta.dns.records.update", {
+      const result = await ctx.callTool("kinsta_dns_records_update", {
         domain_id: "../bad",
         type: "A",
         name: "@",
@@ -163,7 +163,7 @@ describe("DNS Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.dns.records.update", {
+      const result = await ctx.callTool("kinsta_dns_records_update", {
         domain_id: "dom-1",
         type: "A",
         name: "@",
@@ -174,7 +174,7 @@ describe("DNS Tools", () => {
     it("should return success with required fields only", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { ok: true });
-      const result = await ctx.callTool("kinsta.dns.records.update", {
+      const result = await ctx.callTool("kinsta_dns_records_update", {
         domain_id: "dom-1",
         type: "A",
         name: "@",
@@ -190,7 +190,7 @@ describe("DNS Tools", () => {
     it("should include optional fields when provided", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { ok: true });
-      await ctx.callTool("kinsta.dns.records.update", {
+      await ctx.callTool("kinsta_dns_records_update", {
         domain_id: "dom-1",
         type: "A",
         name: "@",
@@ -214,7 +214,7 @@ describe("DNS Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.dns.records.update", {
+      const result = await ctx.callTool("kinsta_dns_records_update", {
         domain_id: "dom-1",
         type: "A",
         name: "@",
@@ -223,9 +223,9 @@ describe("DNS Tools", () => {
     });
   });
 
-  describe("kinsta.dns.records.delete", () => {
+  describe("kinsta_dns_records_delete", () => {
     it("should validate domain_id", async () => {
-      const result = await ctx.callTool("kinsta.dns.records.delete", {
+      const result = await ctx.callTool("kinsta_dns_records_delete", {
         domain_id: "../bad",
         type: "A",
         name: "@",
@@ -235,7 +235,7 @@ describe("DNS Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.dns.records.delete", {
+      const result = await ctx.callTool("kinsta_dns_records_delete", {
         domain_id: "dom-1",
         type: "A",
         name: "@",
@@ -246,7 +246,7 @@ describe("DNS Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { ok: true });
-      const result = await ctx.callTool("kinsta.dns.records.delete", {
+      const result = await ctx.callTool("kinsta_dns_records_delete", {
         domain_id: "dom-1",
         type: "A",
         name: "@",
@@ -264,7 +264,7 @@ describe("DNS Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "NOT_FOUND", "not found");
-      const result = await ctx.callTool("kinsta.dns.records.delete", {
+      const result = await ctx.callTool("kinsta_dns_records_delete", {
         domain_id: "dom-1",
         type: "A",
         name: "@",

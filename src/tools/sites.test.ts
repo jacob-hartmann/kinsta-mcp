@@ -24,33 +24,33 @@ describe("Site Tools", () => {
   });
 
   it("should register all 7 tools", () => {
-    expect(ctx.tools.has("kinsta.sites.list")).toBe(true);
-    expect(ctx.tools.has("kinsta.sites.get")).toBe(true);
-    expect(ctx.tools.has("kinsta.sites.create")).toBe(true);
-    expect(ctx.tools.has("kinsta.sites.create-plain")).toBe(true);
-    expect(ctx.tools.has("kinsta.sites.clone")).toBe(true);
-    expect(ctx.tools.has("kinsta.sites.delete")).toBe(true);
-    expect(ctx.tools.has("kinsta.sites.reset")).toBe(true);
+    expect(ctx.tools.has("kinsta_sites_list")).toBe(true);
+    expect(ctx.tools.has("kinsta_sites_get")).toBe(true);
+    expect(ctx.tools.has("kinsta_sites_create")).toBe(true);
+    expect(ctx.tools.has("kinsta_sites_create-plain")).toBe(true);
+    expect(ctx.tools.has("kinsta_sites_clone")).toBe(true);
+    expect(ctx.tools.has("kinsta_sites_delete")).toBe(true);
+    expect(ctx.tools.has("kinsta_sites_reset")).toBe(true);
   });
 
-  describe("kinsta.sites.list", () => {
+  describe("kinsta_sites_list", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.sites.list", {});
+      const result = await ctx.callTool("kinsta_sites_list", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.sites.list", {});
+      const result = await ctx.callTool("kinsta_sites_list", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success without optional params", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { sites: [] });
-      const result = await ctx.callTool("kinsta.sites.list", {});
+      const result = await ctx.callTool("kinsta_sites_list", {});
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -64,7 +64,7 @@ describe("Site Tools", () => {
     it("should pass include_environments when provided", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { sites: [] });
-      await ctx.callTool("kinsta.sites.list", { include_environments: true });
+      await ctx.callTool("kinsta_sites_list", { include_environments: true });
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
           params: { company: "company-123", include_environments: "true" },
@@ -73,9 +73,9 @@ describe("Site Tools", () => {
     });
   });
 
-  describe("kinsta.sites.get", () => {
+  describe("kinsta_sites_get", () => {
     it("should validate site_id", async () => {
-      const result = await ctx.callTool("kinsta.sites.get", {
+      const result = await ctx.callTool("kinsta_sites_get", {
         site_id: "../bad",
       });
       expect(result).toHaveProperty("isError", true);
@@ -83,21 +83,21 @@ describe("Site Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.sites.get", { site_id: "s1" });
+      const result = await ctx.callTool("kinsta_sites_get", { site_id: "s1" });
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "NOT_FOUND", "not found");
-      const result = await ctx.callTool("kinsta.sites.get", { site_id: "s1" });
+      const result = await ctx.callTool("kinsta_sites_get", { site_id: "s1" });
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { site: { id: "s1" } });
-      const result = await ctx.callTool("kinsta.sites.get", { site_id: "s1" });
+      const result = await ctx.callTool("kinsta_sites_get", { site_id: "s1" });
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -108,7 +108,7 @@ describe("Site Tools", () => {
     });
   });
 
-  describe("kinsta.sites.create", () => {
+  describe("kinsta_sites_create", () => {
     const requiredArgs = {
       display_name: "My Site",
       region: "us-east-1",
@@ -121,14 +121,14 @@ describe("Site Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.sites.create", requiredArgs);
+      const result = await ctx.callTool("kinsta_sites_create", requiredArgs);
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success with required fields only", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { operation_id: "op-1" });
-      const result = await ctx.callTool("kinsta.sites.create", requiredArgs);
+      const result = await ctx.callTool("kinsta_sites_create", requiredArgs);
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -142,7 +142,7 @@ describe("Site Tools", () => {
     it("should include optional booleans when provided", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { operation_id: "op-1" });
-      await ctx.callTool("kinsta.sites.create", {
+      await ctx.callTool("kinsta_sites_create", {
         ...requiredArgs,
         is_multisite: true,
         is_subdomain_multisite: false,
@@ -164,15 +164,15 @@ describe("Site Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "VALIDATION_ERROR", "bad");
-      const result = await ctx.callTool("kinsta.sites.create", requiredArgs);
+      const result = await ctx.callTool("kinsta_sites_create", requiredArgs);
       expect(result).toHaveProperty("isError", true);
     });
   });
 
-  describe("kinsta.sites.create-plain", () => {
+  describe("kinsta_sites_create-plain", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.sites.create-plain", {
+      const result = await ctx.callTool("kinsta_sites_create-plain", {
         display_name: "Plain",
         region: "us-east-1",
       });
@@ -182,7 +182,7 @@ describe("Site Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { operation_id: "op-1" });
-      const result = await ctx.callTool("kinsta.sites.create-plain", {
+      const result = await ctx.callTool("kinsta_sites_create-plain", {
         display_name: "Plain",
         region: "us-east-1",
       });
@@ -203,7 +203,7 @@ describe("Site Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.sites.create-plain", {
+      const result = await ctx.callTool("kinsta_sites_create-plain", {
         display_name: "Plain",
         region: "us-east-1",
       });
@@ -211,10 +211,10 @@ describe("Site Tools", () => {
     });
   });
 
-  describe("kinsta.sites.clone", () => {
+  describe("kinsta_sites_clone", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.sites.clone", {
+      const result = await ctx.callTool("kinsta_sites_clone", {
         display_name: "Clone",
         source_env_id: "env-1",
       });
@@ -224,7 +224,7 @@ describe("Site Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { operation_id: "op-1" });
-      const result = await ctx.callTool("kinsta.sites.clone", {
+      const result = await ctx.callTool("kinsta_sites_clone", {
         display_name: "Clone",
         source_env_id: "env-1",
       });
@@ -245,7 +245,7 @@ describe("Site Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.sites.clone", {
+      const result = await ctx.callTool("kinsta_sites_clone", {
         display_name: "Clone",
         source_env_id: "env-1",
       });
@@ -253,9 +253,9 @@ describe("Site Tools", () => {
     });
   });
 
-  describe("kinsta.sites.delete", () => {
+  describe("kinsta_sites_delete", () => {
     it("should validate site_id", async () => {
-      const result = await ctx.callTool("kinsta.sites.delete", {
+      const result = await ctx.callTool("kinsta_sites_delete", {
         site_id: "../bad",
       });
       expect(result).toHaveProperty("isError", true);
@@ -263,7 +263,7 @@ describe("Site Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.sites.delete", {
+      const result = await ctx.callTool("kinsta_sites_delete", {
         site_id: "s1",
       });
       expect(result).toHaveProperty("isError", true);
@@ -272,7 +272,7 @@ describe("Site Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { ok: true });
-      const result = await ctx.callTool("kinsta.sites.delete", {
+      const result = await ctx.callTool("kinsta_sites_delete", {
         site_id: "s1",
       });
       expect(result).not.toHaveProperty("isError");
@@ -287,16 +287,16 @@ describe("Site Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "NOT_FOUND", "not found");
-      const result = await ctx.callTool("kinsta.sites.delete", {
+      const result = await ctx.callTool("kinsta_sites_delete", {
         site_id: "s1",
       });
       expect(result).toHaveProperty("isError", true);
     });
   });
 
-  describe("kinsta.sites.reset", () => {
+  describe("kinsta_sites_reset", () => {
     it("should validate site_id", async () => {
-      const result = await ctx.callTool("kinsta.sites.reset", {
+      const result = await ctx.callTool("kinsta_sites_reset", {
         site_id: "../bad",
         admin_password: "p",
       });
@@ -305,7 +305,7 @@ describe("Site Tools", () => {
 
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.sites.reset", {
+      const result = await ctx.callTool("kinsta_sites_reset", {
         site_id: "s1",
         admin_password: "p",
       });
@@ -315,14 +315,14 @@ describe("Site Tools", () => {
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { ok: true });
-      const result = await ctx.callTool("kinsta.sites.reset", {
+      const result = await ctx.callTool("kinsta_sites_reset", {
         site_id: "s1",
         admin_password: "newpass",
       });
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
-          path: "/sites/s1/reset",
+          path: "/sites/s1/reset-site",
           method: "POST",
           body: { admin_password: "newpass" },
         })
@@ -332,7 +332,7 @@ describe("Site Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.sites.reset", {
+      const result = await ctx.callTool("kinsta_sites_reset", {
         site_id: "s1",
         admin_password: "p",
       });

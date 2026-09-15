@@ -6,22 +6,16 @@
  */
 
 import { vi } from "vitest";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer, ServerContext } from "@modelcontextprotocol/server";
 import type { KinstaClient } from "../../kinsta/client.js";
 import type { KinstaClientResult } from "../../kinsta/client-factory.js";
-import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
-import type {
-  ServerRequest,
-  ServerNotification,
-} from "@modelcontextprotocol/sdk/types.js";
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 type ToolHandler = (
   args: Record<string, unknown>,
-  extra: RequestHandlerExtra<ServerRequest, ServerNotification>
+  extra: ServerContext
 ) => Promise<Record<string, unknown>> | Record<string, unknown>;
 
 export interface ToolTestContext {
@@ -57,10 +51,7 @@ export function createToolTestContext(): ToolTestContext {
     ),
   } as unknown as McpServer;
 
-  const mockExtra = {} as RequestHandlerExtra<
-    ServerRequest,
-    ServerNotification
-  >;
+  const mockExtra = {} as ServerContext;
 
   const callTool = (name: string, args: Record<string, unknown>) => {
     const handler = tools.get(name);

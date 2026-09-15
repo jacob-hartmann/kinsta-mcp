@@ -23,13 +23,13 @@ describe("Log Tools", () => {
     registerLogTools(ctx.server);
   });
 
-  it("should register kinsta.logs.get", () => {
-    expect(ctx.tools.has("kinsta.logs.get")).toBe(true);
+  it("should register kinsta_logs_get", () => {
+    expect(ctx.tools.has("kinsta_logs_get")).toBe(true);
   });
 
-  describe("kinsta.logs.get", () => {
+  describe("kinsta_logs_get", () => {
     it("should return validation error for invalid env_id", async () => {
-      const result = await ctx.callTool("kinsta.logs.get", {
+      const result = await ctx.callTool("kinsta_logs_get", {
         env_id: "../invalid",
       });
       expect(result).toHaveProperty("isError", true);
@@ -38,7 +38,7 @@ describe("Log Tools", () => {
 
     it("should return auth error when client fails", async () => {
       mockClientAuthFailure(getKinstaClientMock);
-      const result = await ctx.callTool("kinsta.logs.get", {
+      const result = await ctx.callTool("kinsta_logs_get", {
         env_id: "env-123",
       });
       expect(result).toHaveProperty("isError", true);
@@ -49,39 +49,53 @@ describe("Log Tools", () => {
       mockClientSuccess(getKinstaClientMock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
 
-      const result = await ctx.callTool("kinsta.logs.get", {
+      const result = await ctx.callTool("kinsta_logs_get", {
         env_id: "env-123",
       });
       expect(result).toHaveProperty("isError", true);
       expect((result as any).content[0].text).toContain("SERVER_ERROR");
     });
 
-    it("should return success without optional params", async () => {
+    it("should return success with API defaults", async () => {
       mockClientSuccess(getKinstaClientMock, ctx);
       mockRequestSuccess(ctx, { logs: "data" });
 
-      const result = await ctx.callTool("kinsta.logs.get", {
+      const result = await ctx.callTool("kinsta_logs_get", {
         env_id: "env-123",
       });
       expect(result).not.toHaveProperty("isError");
       expect((result as any).content[0].text).toContain("logs");
+      expect(ctx.mockClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          params: { file_name: "error", lines: "1000" },
+        })
+      );
     });
 
     it("should pass optional file_name and lines params", async () => {
       mockClientSuccess(getKinstaClientMock, ctx);
       mockRequestSuccess(ctx, { logs: "data" });
 
-      await ctx.callTool("kinsta.logs.get", {
+      await ctx.callTool("kinsta_logs_get", {
         env_id: "env-123",
-        file_name: "error.log",
+        file_name: "access",
         lines: 100,
+        from: "2026-07-23 00:00:00+00:00",
+        to: "2026-07-24 00:00:00+00:00",
+        search: "warning",
       });
 
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
           path: "/sites/environments/env-123/logs",
           method: "GET",
-          params: { file_name: "error.log", lines: "100" },
+          params: {
+            file_name: "access",
+            lines: "100",
+            from: "2026-07-23 00:00:00+00:00",
+            to: "2026-07-24 00:00:00+00:00",
+            search: "warning",
+          },
         })
       );
     });

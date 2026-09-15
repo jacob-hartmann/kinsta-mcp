@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
 import {
@@ -6,137 +6,134 @@ import {
   formatError,
   formatSuccess,
   formatValidationError,
-  kinstaOutputSchema,
   validateId,
 } from "./utils.js";
 
 export function registerEdgeCdnTools(server: McpServer): void {
   server.registerTool(
-    "kinsta.edge-cache.clear",
+    "kinsta_edge-cache_clear",
     {
       title: "Clear Edge Cache",
       description:
         "Clear the edge cache for an environment. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
+        clear_subdirectories: z.boolean().optional(),
+        url: z.string().optional(),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/edge-cache/clear`,
+        path: "/sites/edge-caching/clear",
         method: "POST",
+        body: {
+          environment_id: args.env_id,
+          ...(args.clear_subdirectories !== undefined && {
+            clear_subdirectories: args.clear_subdirectories,
+          }),
+          ...(args.url !== undefined && { url: args.url }),
+        },
       });
 
       if (!result.success) return formatError(result.error, "environment");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.edge-cache.toggle",
+    "kinsta_edge-cache_toggle",
     {
       title: "Toggle Edge Cache",
       description: "Enable or disable edge caching for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        is_enabled: z
+        enabled: z
           .boolean()
           .describe("Whether to enable (true) or disable (false) edge caching"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/edge-cache/status`,
+        path: "/sites/edge-caching/status",
         method: "PUT",
-        body: { is_enabled: args.is_enabled },
+        body: { environment_id: args.env_id, enabled: args.enabled },
       });
 
       if (!result.success) return formatError(result.error, "environment");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.cdn.clear-cache",
+    "kinsta_cdn_clear-cache",
     {
       title: "Clear CDN Cache",
       description:
         "Clear the CDN cache for an environment. Returns an operation_id.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
+        cdn_cache_id: z.string().describe("The CDN cache ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/cdn-cache/clear`,
+        path: "/sites/cdn/clear-cache",
         method: "POST",
+        body: {
+          environment_id: args.env_id,
+          cdn_cache_id: args.cdn_cache_id,
+        },
       });
 
       if (!result.success) return formatError(result.error, "environment");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.cdn.image-optimization",
+    "kinsta_cdn_image-optimization",
     {
       title: "Configure Image Optimization",
       description:
         "Configure CDN image optimization settings for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
-        is_enabled: z
-          .boolean()
-          .describe("Whether to enable image optimization"),
-        is_lossless: z
-          .boolean()
-          .optional()
-          .describe("Use lossless compression (true) or lossy (false)"),
+        image_optimization_type: z
+          .union([z.literal(false), z.literal("lossy"), z.literal("lossless")])
+          .describe(
+            "Disable optimization or select lossy/lossless compression"
+          ),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
-      const body: Record<string, unknown> = {
-        is_enabled: args.is_enabled,
-      };
-      if (args.is_lossless !== undefined)
-        body["is_lossless"] = args.is_lossless;
-
       const result = await clientResult.client.request<unknown>({
-        path: `/sites/environments/${args.env_id}/cdn/image-optimization`,
+        path: "/sites/cdn/image-optimization",
         method: "PUT",
-        body,
+        body: {
+          environment_id: args.env_id,
+          image_optimization_type: args.image_optimization_type,
+        },
       });
 
       if (!result.success) return formatError(result.error, "environment");

@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
+import { McpServer } from "@modelcontextprotocol/server";
 
 // Mock McpServer - must be inline due to hoisting
-vi.mock("@modelcontextprotocol/sdk/server/mcp.js", () => {
+vi.mock("@modelcontextprotocol/server", () => {
   return {
     McpServer: class MockMcpServer {
       config: { name: string; version: string };
@@ -14,11 +16,12 @@ vi.mock("@modelcontextprotocol/sdk/server/mcp.js", () => {
   };
 });
 
-vi.mock("@modelcontextprotocol/sdk/server/stdio.js", () => {
+vi.mock("@modelcontextprotocol/server/stdio", () => {
   return {
-    // Empty class for mock - no methods needed for these tests
-    // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-    StdioServerTransport: class MockStdioServerTransport {},
+    serveStdio: vi.fn((factory: () => unknown) => ({
+      server: factory(),
+      close: vi.fn().mockResolvedValue(undefined),
+    })),
   };
 });
 
@@ -33,9 +36,6 @@ vi.mock("./resources/index.js", () => ({
 vi.mock("./prompts/index.js", () => ({
   registerPrompts: vi.fn(),
 }));
-
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerTools } from "./tools/index.js";
 import { registerResources } from "./resources/index.js";
 import { registerPrompts } from "./prompts/index.js";
@@ -76,23 +76,14 @@ describe("Kinsta MCP Server Components", () => {
     });
   });
 
-  describe("StdioServerTransport", () => {
-    it("should be able to create transport", () => {
-      const transport = new StdioServerTransport();
+  describe("stdio serving", () => {
+    it("should serve a server factory", () => {
+      const factory = () =>
+        new McpServer({ name: "kinsta-mcp", version: "0.1.0" });
+      const handle = serveStdio(factory) as unknown as { server: McpServer };
 
-      expect(transport).toBeDefined();
-    });
-
-    it("should connect server with transport", async () => {
-      const server = new McpServer({
-        name: "kinsta-mcp",
-        version: "0.1.0",
-      }) as unknown as { connect: (transport: unknown) => Promise<void> };
-      const transport = new StdioServerTransport();
-
-      await server.connect(transport);
-
-      expect(vi.mocked(server.connect)).toHaveBeenCalledWith(transport);
+      expect(serveStdio).toHaveBeenCalledWith(factory);
+      expect(handle.server).toBeDefined();
     });
   });
 
@@ -117,20 +108,6 @@ describe("Kinsta MCP Server Components", () => {
       expect(registerTools).toHaveBeenCalledTimes(1);
       expect(registerResources).toHaveBeenCalledTimes(1);
       expect(registerPrompts).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("startStdioServer behavior", () => {
-    it("should connect server to stdio transport", async () => {
-      const server = new McpServer({
-        name: "kinsta-mcp",
-        version: "0.1.0",
-      }) as unknown as { connect: (transport: unknown) => Promise<void> };
-      const transport = new StdioServerTransport();
-
-      await server.connect(transport);
-
-      expect(vi.mocked(server.connect)).toHaveBeenCalledWith(transport);
     });
   });
 });

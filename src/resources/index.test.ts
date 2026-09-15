@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 
 vi.mock("../kinsta/client-factory.js", () => ({
   getKinstaClientOrThrow: vi.fn(),
 }));
 
-vi.mock("@modelcontextprotocol/sdk/server/mcp.js", () => ({
+vi.mock("@modelcontextprotocol/server", () => ({
   ResourceTemplate: class ResourceTemplate {
     constructor(
       public uri: string,
@@ -130,7 +130,7 @@ describe("registerResources", () => {
 
       const listResult = await res.template.opts.list({} as any);
       expect(listResult.resources).toEqual([
-        { uri: "kinsta://sites/s1", name: "Site 1" },
+        { uri: "kinsta://sites/s1", name: "Site_1", title: "Site 1" },
       ]);
     });
 
@@ -192,7 +192,11 @@ describe("registerResources", () => {
 
       const listResult = await res.template.opts.list({} as any);
       expect(listResult.resources).toEqual([
-        { uri: "kinsta://sites/s1/environments", name: "Site 1 Environments" },
+        {
+          uri: "kinsta://sites/s1/environments",
+          name: "Site_1_environments",
+          title: "Site 1 Environments",
+        },
       ]);
     });
 

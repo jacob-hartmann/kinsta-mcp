@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { registerPingTool } from "./ping.js";
 
 // Mock the auth module
@@ -9,8 +9,9 @@ vi.mock("../kinsta/auth.js", () => ({
 
 import { isKinstaConfigured } from "../kinsta/auth.js";
 
-describe("kinsta.ping tool", () => {
+describe("kinsta_ping tool", () => {
   let server: McpServer;
+  let registerTool: ReturnType<typeof vi.fn>;
   let registeredTools: Map<
     string,
     {
@@ -24,20 +25,19 @@ describe("kinsta.ping tool", () => {
 
     // Create a mock server that captures registered tools
     registeredTools = new Map();
-    server = {
-      registerTool: vi.fn(
-        (
-          name: string,
-          config: { description: string },
-          handler: (params: Record<string, unknown>, extra: unknown) => unknown
-        ) => {
-          registeredTools.set(name, {
-            description: config.description,
-            handler,
-          });
-        }
-      ),
-    } as unknown as McpServer;
+    registerTool = vi.fn(
+      (
+        name: string,
+        config: { description: string },
+        handler: (params: Record<string, unknown>, extra: unknown) => unknown
+      ) => {
+        registeredTools.set(name, {
+          description: config.description,
+          handler,
+        });
+      }
+    );
+    server = { registerTool } as unknown as McpServer;
 
     registerPingTool(server);
   });
@@ -46,15 +46,15 @@ describe("kinsta.ping tool", () => {
     vi.resetAllMocks();
   });
 
-  it("should register the kinsta.ping tool", () => {
-    expect(server.registerTool).toHaveBeenCalledTimes(1);
-    expect(registeredTools.has("kinsta.ping")).toBe(true);
+  it("should register the kinsta_ping tool", () => {
+    expect(registerTool).toHaveBeenCalledTimes(1);
+    expect(registeredTools.has("kinsta_ping")).toBe(true);
   });
 
   it("should return success when credentials are configured", () => {
     vi.mocked(isKinstaConfigured).mockReturnValue(true);
 
-    const tool = registeredTools.get("kinsta.ping");
+    const tool = registeredTools.get("kinsta_ping");
     expect(tool).toBeDefined();
     if (!tool) return;
 
@@ -72,7 +72,7 @@ describe("kinsta.ping tool", () => {
   it("should return error when credentials are not configured", () => {
     vi.mocked(isKinstaConfigured).mockReturnValue(false);
 
-    const tool = registeredTools.get("kinsta.ping");
+    const tool = registeredTools.get("kinsta_ping");
     expect(tool).toBeDefined();
     if (!tool) return;
 

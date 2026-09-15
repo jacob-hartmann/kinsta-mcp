@@ -3,8 +3,7 @@
  *
  * Registers all available tools with the MCP server.
  */
-
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { registerPingTool } from "./ping.js";
 import { registerOperationTools } from "./operations.js";
 import { registerCompanyTools } from "./company.js";

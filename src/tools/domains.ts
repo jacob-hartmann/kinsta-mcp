@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
 import {
@@ -6,35 +6,32 @@ import {
   formatError,
   formatSuccess,
   formatValidationError,
-  kinstaOutputSchema,
   validateId,
 } from "./utils.js";
 
 export function registerDomainTools(server: McpServer): void {
   server.registerTool(
-    "kinsta.domains.list",
+    "kinsta_domains_list",
     {
       title: "List Domains",
       description: "List all custom domains for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/domains`,
+        path: `/sites/environments/${args.env_id}/domains`,
         method: "GET",
       });
 
@@ -42,9 +39,8 @@ export function registerDomainTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.domains.add",
+    "kinsta_domains_add",
     {
       title: "Add Domain",
       description: "Add a custom domain to an environment.",
@@ -53,30 +49,47 @@ export function registerDomainTools(server: McpServer): void {
         domain_name: z
           .string()
           .describe("The domain name to add (e.g. example.com)"),
+        is_wildcardless: z.boolean().optional(),
+        add_with_www_subdomain: z.boolean().optional(),
+        setup_type: z.enum(["quick", "avoid_downtime"]).optional(),
+        custom_ssl_key: z.string().optional(),
+        custom_ssl_cert: z.string().optional(),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/domains`,
+        path: `/sites/environments/${args.env_id}/domains`,
         method: "POST",
-        body: { domain_name: args.domain_name },
+        body: {
+          domain_name: args.domain_name,
+          ...(args.is_wildcardless !== undefined && {
+            is_wildcardless: args.is_wildcardless,
+          }),
+          ...(args.add_with_www_subdomain !== undefined && {
+            add_with_www_subdomain: args.add_with_www_subdomain,
+          }),
+          ...(args.setup_type !== undefined && { setup_type: args.setup_type }),
+          ...(args.custom_ssl_key !== undefined && {
+            custom_ssl_key: args.custom_ssl_key,
+          }),
+          ...(args.custom_ssl_cert !== undefined && {
+            custom_ssl_cert: args.custom_ssl_cert,
+          }),
+        },
       });
 
       if (!result.success) return formatError(result.error, "domain");
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.domains.delete",
+    "kinsta_domains_delete",
     {
       title: "Delete Domains",
       description: "Remove custom domains from an environment.",
@@ -86,18 +99,16 @@ export function registerDomainTools(server: McpServer): void {
           .array(z.string())
           .describe("Array of domain IDs to remove"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { destructiveHint: true, openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/domains`,
+        path: `/sites/environments/${args.env_id}/domains`,
         method: "DELETE",
         body: { domain_ids: args.domain_ids },
       });
@@ -106,33 +117,30 @@ export function registerDomainTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.domains.verification",
+    "kinsta_domains_verification",
     {
       title: "Get Domain Verification",
       description: "Get DNS verification records for a domain.",
       inputSchema: z.object({
-        domain_id: z
+        site_domain_id: z
           .string()
           .describe("The domain ID to get verification records for"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
-      const domainIdError = validateId(args.domain_id, "domain_id");
+    async (args, ctx) => {
+      const domainIdError = validateId(args.site_domain_id, "site_domain_id");
       if (domainIdError) return formatValidationError(domainIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/domains/${args.domain_id}/verification-records`,
+        path: `/sites/environments/domains/${args.site_domain_id}/verification-records`,
         method: "GET",
       });
 
@@ -140,30 +148,35 @@ export function registerDomainTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.domains.set-primary",
+    "kinsta_domains_set-primary",
     {
       title: "Set Primary Domain",
       description: "Set the primary domain for an environment.",
       inputSchema: z.object({
         env_id: z.string().describe("The environment ID"),
         domain_id: z.string().describe("The domain ID to set as primary"),
+        run_search_and_replace: z
+          .boolean()
+          .default(false)
+          .describe("Update WordPress URLs after changing the primary domain"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: { openWorldHint: true },
     },
-    async (args, extra) => {
+    async (args, ctx) => {
       const envIdError = validateId(args.env_id, "env_id");
       if (envIdError) return formatValidationError(envIdError);
-
-      const clientResult = getKinstaClient(extra);
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const result = await clientResult.client.request<unknown>({
-        path: `/environments/${args.env_id}/primary-domain`,
+        path: `/sites/environments/${args.env_id}/change-primary-domain`,
         method: "PUT",
-        body: { domain_id: args.domain_id },
+        body: {
+          domain_id: args.domain_id,
+          run_search_and_replace:
+            (args.run_search_and_replace as boolean | undefined) ?? false,
+        },
       });
 
       if (!result.success) return formatError(result.error, "domain");

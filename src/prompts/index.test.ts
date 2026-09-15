@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { registerPrompts } from "./index.js";
 
 type PromptHandler = (args: Record<string, string | undefined>) => any;
@@ -12,23 +12,23 @@ interface RegisteredPrompt {
 
 function setupPrompts() {
   const prompts: RegisteredPrompt[] = [];
-
+  const registerPrompt = vi.fn(
+    (name: string, config: any, handler: PromptHandler) => {
+      prompts.push({ name, config, handler });
+    }
+  );
   const server = {
-    registerPrompt: vi.fn(
-      (name: string, config: any, handler: PromptHandler) => {
-        prompts.push({ name, config, handler });
-      }
-    ),
+    registerPrompt,
   } as unknown as McpServer;
 
   registerPrompts(server);
-  return { server, prompts };
+  return { prompts, registerPrompt };
 }
 
 describe("registerPrompts", () => {
   it("should register all 4 prompts", () => {
-    const { server } = setupPrompts();
-    expect(server.registerPrompt).toHaveBeenCalledTimes(4);
+    const { registerPrompt } = setupPrompts();
+    expect(registerPrompt).toHaveBeenCalledTimes(4);
   });
 
   describe("deploy-site", () => {

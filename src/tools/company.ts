@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { getKinstaClient } from "../kinsta/client-factory.js";
 import {
@@ -6,25 +6,23 @@ import {
   formatError,
   formatSuccess,
   buildParams,
-  kinstaOutputSchema,
 } from "./utils.js";
 
 export function registerCompanyTools(server: McpServer): void {
   server.registerTool(
-    "kinsta.company.users",
+    "kinsta_company_users",
     {
       title: "List Company Users",
       description: "List all users in your Kinsta company.",
       inputSchema: z.object({}),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (_args, extra) => {
-      const clientResult = getKinstaClient(extra);
+    async (_args, ctx) => {
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const companyId = clientResult.client.getCompanyId();
@@ -37,23 +35,21 @@ export function registerCompanyTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.company.regions",
+    "kinsta_company_regions",
     {
       title: "List Available Regions",
       description:
         "List all available deployment regions for your Kinsta company.",
       inputSchema: z.object({}),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (_args, extra) => {
-      const clientResult = getKinstaClient(extra);
+    async (_args, ctx) => {
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const companyId = clientResult.client.getCompanyId();
@@ -66,22 +62,20 @@ export function registerCompanyTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.company.api-keys",
+    "kinsta_company_api-keys",
     {
       title: "List API Keys",
       description: "List all API keys for your Kinsta company.",
       inputSchema: z.object({}),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (_args, extra) => {
-      const clientResult = getKinstaClient(extra);
+    async (_args, ctx) => {
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const companyId = clientResult.client.getCompanyId();
@@ -94,9 +88,8 @@ export function registerCompanyTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.company.activity-logs",
+    "kinsta_company_activity-logs",
     {
       title: "List Activity Logs",
       description:
@@ -128,15 +121,14 @@ export function registerCompanyTools(server: McpServer): void {
           .optional()
           .describe("Language for log messages"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
-      const clientResult = getKinstaClient(extra);
+    async (args, ctx) => {
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const companyId = clientResult.client.getCompanyId();
@@ -158,9 +150,8 @@ export function registerCompanyTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.company.plugins",
+    "kinsta_company_plugins",
     {
       title: "List Company Plugins",
       description:
@@ -170,27 +161,29 @@ export function registerCompanyTools(server: McpServer): void {
         limit: z.number().optional().describe("Number of results to return"),
         search: z.string().optional().describe("Search term to filter plugins"),
         status: z
-          .string()
+          .enum(["active", "inactive"])
           .optional()
           .describe("Filter by plugin status (e.g. active, inactive)"),
-        column: z.string().optional().describe("Column to sort by"),
+        column: z
+          .enum(["vulnerable", "updatesAvailable"])
+          .optional()
+          .describe("Column filter"),
         order_by: z
           .object({
-            field: z.string().describe("Field to sort by"),
-            order: z.string().describe("Sort direction (asc or desc)"),
+            field: z.enum(["name", "environments", "updates"]),
+            order: z.enum(["ascend", "descend"]),
           })
           .optional()
           .describe("Sort configuration"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
-      const clientResult = getKinstaClient(extra);
+    async (args, ctx) => {
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const companyId = clientResult.client.getCompanyId();
@@ -211,9 +204,8 @@ export function registerCompanyTools(server: McpServer): void {
       return formatSuccess(result.data);
     }
   );
-
   server.registerTool(
-    "kinsta.company.themes",
+    "kinsta_company_themes",
     {
       title: "List Company Themes",
       description:
@@ -223,27 +215,29 @@ export function registerCompanyTools(server: McpServer): void {
         limit: z.number().optional().describe("Number of results to return"),
         search: z.string().optional().describe("Search term to filter themes"),
         status: z
-          .string()
+          .enum(["active", "inactive"])
           .optional()
           .describe("Filter by theme status (e.g. active, inactive)"),
-        column: z.string().optional().describe("Column to sort by"),
+        column: z
+          .enum(["vulnerable", "updatesAvailable"])
+          .optional()
+          .describe("Column filter"),
         order_by: z
           .object({
-            field: z.string().describe("Field to sort by"),
-            order: z.string().describe("Sort direction (asc or desc)"),
+            field: z.enum(["name", "environments", "updates"]),
+            order: z.enum(["ascend", "descend"]),
           })
           .optional()
           .describe("Sort configuration"),
       }),
-      outputSchema: kinstaOutputSchema,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
         openWorldHint: true,
       },
     },
-    async (args, extra) => {
-      const clientResult = getKinstaClient(extra);
+    async (args, ctx) => {
+      const clientResult = getKinstaClient(ctx);
       if (!clientResult.success) return formatAuthError(clientResult.error);
 
       const companyId = clientResult.client.getCompanyId();

@@ -24,32 +24,32 @@ describe("Company Tools", () => {
   });
 
   it("should register all 6 tools", () => {
-    expect(ctx.tools.has("kinsta.company.users")).toBe(true);
-    expect(ctx.tools.has("kinsta.company.regions")).toBe(true);
-    expect(ctx.tools.has("kinsta.company.api-keys")).toBe(true);
-    expect(ctx.tools.has("kinsta.company.activity-logs")).toBe(true);
-    expect(ctx.tools.has("kinsta.company.plugins")).toBe(true);
-    expect(ctx.tools.has("kinsta.company.themes")).toBe(true);
+    expect(ctx.tools.has("kinsta_company_users")).toBe(true);
+    expect(ctx.tools.has("kinsta_company_regions")).toBe(true);
+    expect(ctx.tools.has("kinsta_company_api-keys")).toBe(true);
+    expect(ctx.tools.has("kinsta_company_activity-logs")).toBe(true);
+    expect(ctx.tools.has("kinsta_company_plugins")).toBe(true);
+    expect(ctx.tools.has("kinsta_company_themes")).toBe(true);
   });
 
-  describe("kinsta.company.users", () => {
+  describe("kinsta_company_users", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.company.users", {});
+      const result = await ctx.callTool("kinsta_company_users", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.company.users", {});
+      const result = await ctx.callTool("kinsta_company_users", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { users: [] });
-      const result = await ctx.callTool("kinsta.company.users", {});
+      const result = await ctx.callTool("kinsta_company_users", {});
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -60,17 +60,17 @@ describe("Company Tools", () => {
     });
   });
 
-  describe("kinsta.company.regions", () => {
+  describe("kinsta_company_regions", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.company.regions", {});
+      const result = await ctx.callTool("kinsta_company_regions", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { regions: [] });
-      const result = await ctx.callTool("kinsta.company.regions", {});
+      const result = await ctx.callTool("kinsta_company_regions", {});
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -82,22 +82,22 @@ describe("Company Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.company.regions", {});
+      const result = await ctx.callTool("kinsta_company_regions", {});
       expect(result).toHaveProperty("isError", true);
     });
   });
 
-  describe("kinsta.company.api-keys", () => {
+  describe("kinsta_company_api-keys", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.company.api-keys", {});
+      const result = await ctx.callTool("kinsta_company_api-keys", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { keys: [] });
-      const result = await ctx.callTool("kinsta.company.api-keys", {});
+      const result = await ctx.callTool("kinsta_company_api-keys", {});
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -109,22 +109,22 @@ describe("Company Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.company.api-keys", {});
+      const result = await ctx.callTool("kinsta_company_api-keys", {});
       expect(result).toHaveProperty("isError", true);
     });
   });
 
-  describe("kinsta.company.activity-logs", () => {
+  describe("kinsta_company_activity-logs", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.company.activity-logs", {});
+      const result = await ctx.callTool("kinsta_company_activity-logs", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success without optional params", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { logs: [] });
-      const result = await ctx.callTool("kinsta.company.activity-logs", {});
+      const result = await ctx.callTool("kinsta_company_activity-logs", {});
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -137,7 +137,7 @@ describe("Company Tools", () => {
     it("should pass all optional params", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { logs: [] });
-      await ctx.callTool("kinsta.company.activity-logs", {
+      await ctx.callTool("kinsta_company_activity-logs", {
         limit: 10,
         offset: 5,
         category: "siteActions",
@@ -164,22 +164,22 @@ describe("Company Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.company.activity-logs", {});
+      const result = await ctx.callTool("kinsta_company_activity-logs", {});
       expect(result).toHaveProperty("isError", true);
     });
   });
 
-  describe("kinsta.company.plugins", () => {
+  describe("kinsta_company_plugins", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.company.plugins", {});
+      const result = await ctx.callTool("kinsta_company_plugins", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success without optional params", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { plugins: [] });
-      const result = await ctx.callTool("kinsta.company.plugins", {});
+      const result = await ctx.callTool("kinsta_company_plugins", {});
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -191,7 +191,7 @@ describe("Company Tools", () => {
     it("should include order_by as JSON string when provided", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { plugins: [] });
-      await ctx.callTool("kinsta.company.plugins", {
+      await ctx.callTool("kinsta_company_plugins", {
         order_by: { field: "name", order: "asc" },
       });
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
@@ -206,7 +206,7 @@ describe("Company Tools", () => {
     it("should pass optional params", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { plugins: [] });
-      await ctx.callTool("kinsta.company.plugins", {
+      await ctx.callTool("kinsta_company_plugins", {
         offset: 0,
         limit: 10,
         search: "woo",
@@ -229,22 +229,22 @@ describe("Company Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.company.plugins", {});
+      const result = await ctx.callTool("kinsta_company_plugins", {});
       expect(result).toHaveProperty("isError", true);
     });
   });
 
-  describe("kinsta.company.themes", () => {
+  describe("kinsta_company_themes", () => {
     it("should handle auth failure", async () => {
       mockClientAuthFailure(mock);
-      const result = await ctx.callTool("kinsta.company.themes", {});
+      const result = await ctx.callTool("kinsta_company_themes", {});
       expect(result).toHaveProperty("isError", true);
     });
 
     it("should return success without optional params", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { themes: [] });
-      const result = await ctx.callTool("kinsta.company.themes", {});
+      const result = await ctx.callTool("kinsta_company_themes", {});
       expect(result).not.toHaveProperty("isError");
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -256,7 +256,7 @@ describe("Company Tools", () => {
     it("should include order_by as JSON string when provided", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { themes: [] });
-      await ctx.callTool("kinsta.company.themes", {
+      await ctx.callTool("kinsta_company_themes", {
         order_by: { field: "name", order: "desc" },
       });
       expect(ctx.mockClient.request).toHaveBeenCalledWith(
@@ -271,7 +271,7 @@ describe("Company Tools", () => {
     it("should pass optional params", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestSuccess(ctx, { themes: [] });
-      await ctx.callTool("kinsta.company.themes", {
+      await ctx.callTool("kinsta_company_themes", {
         offset: 0,
         limit: 10,
         search: "theme",
@@ -294,7 +294,7 @@ describe("Company Tools", () => {
     it("should handle API error", async () => {
       mockClientSuccess(mock, ctx);
       mockRequestError(ctx, "SERVER_ERROR", "fail");
-      const result = await ctx.callTool("kinsta.company.themes", {});
+      const result = await ctx.callTool("kinsta_company_themes", {});
       expect(result).toHaveProperty("isError", true);
     });
   });

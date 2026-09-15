@@ -1,6 +1,6 @@
 {
   "name": "kinsta-mcp",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Model Context Protocol (MCP) server for Kinsta WordPress hosting",
   "type": "module",
   "main": "./dist/index.js",
@@ -48,25 +48,39 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@10.34.5",
+  "pnpm": {
+    "overrides": {
+      "@hono/node-server": "2.1.1",
+      "@humanfs/node": "0.16.8",
+      "brace-expansion": "5.0.12",
+      "fast-uri": "4.1.5",
+      "hono": "4.13.8",
+      "ip-address": "10.7.1",
+      "path-to-regexp": "8.4.2",
+      "picomatch": "4.0.7",
+      "qs": "6.16.0",
+      "rollup": "4.63.3",
+      "ws": "8.21.3"
+    }
+  },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.27.1",
-    "cross-env": "^10.1.0",
-    "dotenv": "^17.2.3",
-    "zod": "4.3.6"
+    "@modelcontextprotocol/server": "2.0.0",
+    "dotenv": "^17.4.2",
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@modelcontextprotocol/inspector": "0.21.1",
-    "@types/node": "25.5.0",
-    "@vitest/coverage-v8": "4.1.0",
-    "eslint": "10.1.0",
+    "@modelcontextprotocol/inspector": "2.6.0",
+    "@types/node": "24.13.4",
+    "@vitest/coverage-v8": "5.0.1",
+    "eslint": "10.10.0",
     "eslint-config-prettier": "10.1.8",
-    "prettier": "3.8.1",
+    "prettier": "3.9.6",
     "tsup": "8.5.1",
-    "tsx": "4.21.0",
+    "tsx": "4.23.13",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.57.1",
-    "vitest": "4.1.0"
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.1"
   }
 }

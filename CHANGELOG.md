@@ -7,13 +7,23 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-15
+
 ### Added
+
+- 18 tools added in Kinsta API 1.110.0, including WordPress admin, Force HTTPS, search and replace, analytics, and downloadable backups.
 
 ### Changed
 
+- Tool names now use MCP-safe underscores instead of dots.
+- Updated to MCP 2026-07-28 and refreshed the inspector, test tools, lint tools, and GitHub Actions.
+- Updated existing tools to match Kinsta API 1.110.0 paths and request fields.
+
 ### Fixed
 
-### Security
+- Resource names are now accepted by clients with strict MCP name validation.
+- Fixed tool discovery in Claude Desktop Chat and Cursor.
+- Fixed WordPress plugin, theme, analytics, backup, domain, CDN, SSH, site tool, and log requests.
 
 ## [1.0.0] - 2026-02-08
 
