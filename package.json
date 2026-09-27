@@ -66,8 +66,8 @@
     }
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.0.0",
-    "dotenv": "^17.4.2",
+    "@modelcontextprotocol/server": "2.1.0",
+    "dotenv": "^18.0.3",
     "zod": "4.6.5"
   },
   "devDependencies": {
