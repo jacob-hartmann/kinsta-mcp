@@ -7,6 +7,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-26
+
+This release updates dependencies only. Tools, resources, and prompts are unchanged.
+
+### Security
+
+- Updated `@modelcontextprotocol/server` from 2.0.0 to 2.4.0. This fixes advisories in the MCP TypeScript SDK that affected versions before 2.1.0 and 2.3.0.
+- Updated `zod` from 4.6.5 to 4.6.7. This fixes memory exhaustion when validating oversized input.
+
+### Changed
+
+- Updated development tooling (MCP Inspector, Vitest, ESLint, Prettier, typescript-eslint, tsx, Node.js types) and the pinned GitHub Actions.
+
 ## [1.1.0] - 2026-09-15
 
 ### Added
